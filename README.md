@@ -1,112 +1,197 @@
 # CMS-Core
 
-CMS-Core is the foundation for building powerful, multi-tenant content management systems. Designed with simplicity and scalability in mind, it provides a robust starting point for developers who need a flexible, team-based platform for managing digital content and business operations.
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/idoneo/cms-core.svg?style=flat-square)](https://packagist.org/packages/idoneo/cms-core)
+[![Total Downloads](https://img.shields.io/packagist/dt/idoneo/cms-core.svg?style=flat-square)](https://packagist.org/packages/idoneo/cms-core)
+[![License](https://img.shields.io/packagist/l/idoneo/cms-core.svg?style=flat-square)](https://packagist.org/packages/idoneo/cms-core)
 
-## Stack
-
-- **[Laravel 12](https://laravel.com)** - The PHP Framework for Web Artisans
-- **[Filament 4](https://filamentphp.com)** - Beautiful admin panels built with TALL stack
-- **[Jetstream](https://jetstream.laravel.com)** - Authentication scaffolding with Teams support
-- **[Livewire 3](https://livewire.laravel.com)** - Full-stack framework for Laravel
-- **[Spatie Permission](https://spatie.be/docs/laravel-permission)** - Role and permission management
-- **[Tailwind CSS](https://tailwindcss.com)** - Utility-first CSS framework
+Multi-tenant CMS foundation with Teams support, Livewire components and Filament integration for Laravel.
 
 ## Features
 
-- Multi-tenant architecture with optional Teams support
-- Role-based access control (RBAC)
-- Modern admin panel powered by Filament
-- Two-factor authentication
-- API support with Laravel Sanctum
-- Legacy database connection support
-
-## Requirements
-
-- PHP 8.2+
-- Composer
-- Node.js & NPM
-- MySQL / MariaDB / SQLite
+- **BelongsToCurrentTeam** trait for automatic team scoping
+- **TeamSwitcher** Livewire component with alphabetical sorting
+- **CmsCorePlugin** for Filament panels with user menu
+- Toggle teams feature via environment variable
 
 ## Installation
 
-Clone the repository:
+### Quick Setup (Recommended)
+
+Install the package via composer (this also installs Jetstream, Filament, Livewire, and Spatie Permission as dependencies):
 
 ```bash
-git clone git@github.com:diego-mascarenhas/cms-core.git
-cd cms-core
-composer install
+composer require idoneo/cms-core
 ```
 
-Configure environment variables:
+Run the installation command:
 
 ```bash
-cp .env.example .env
+php artisan cms-core:install --fresh --seed
 ```
 
-Generate application key and run migrations:
+This will:
+- Configure Jetstream with Livewire + Teams
+- Publish config files
+- Publish and run migrations
+- Install Filament panel
+- Create admin user (hola@humano.app / Simplicity!)
+
+Build assets:
 
 ```bash
-php artisan key:generate
-php artisan migrate --seed
+npm install && npm run build
 ```
 
-Install frontend dependencies and build assets:
+### Manual Setup
+
+If you need more control:
 
 ```bash
-npm install
-npm run build
+# Install dependencies
+composer require idoneo/cms-core
+
+# Install Jetstream manually
+php artisan jetstream:install livewire --teams
+
+# Publish CMS-Core assets
+php artisan vendor:publish --tag="cms-core"
+
+# Run migrations
+php artisan migrate
+
+# Build assets
+npm install && npm run build
 ```
 
-## Configuration
+Register the plugin in your `AdminPanelProvider`:
 
-### Teams Feature
+```php
+use Idoneo\CmsCore\Filament\CmsCorePlugin;
 
-Teams can be enabled or disabled via environment variable:
-
-```env
-# Enable teams (multi-tenant)
-APP_TEAMS=true
-
-# Disable teams (single user)
-APP_TEAMS=false
+public function panel(Panel $panel): Panel
+{
+    return $panel
+        ->plugin(CmsCorePlugin::make())
+        // ... other configuration
+}
 ```
 
-### Legacy Database Connection
+### Default Credentials
 
-For migrations from legacy systems:
-
-```env
-DB_LEGACY_CONNECTION=mysql
-DB_LEGACY_HOST=127.0.0.1
-DB_LEGACY_PORT=3306
-DB_LEGACY_DATABASE=cms_legacy
-DB_LEGACY_USERNAME=root
-DB_LEGACY_PASSWORD=
-```
-
-## Default Credentials
-
-After running seeders:
+After running with `--seed` flag:
 
 | Field | Value |
 |-------|-------|
 | Email | `hola@humano.app` |
 | Password | `Simplicity!` |
 
-Access the admin panel at: `/admin`
+## Configuration
 
-## Contributing
+Add to your `.env` file:
 
-Thank you for considering contributing to CMS-Core!
+```env
+# Enable teams feature (default: false)
+APP_TEAMS=true
+```
+
+## Usage
+
+### BelongsToCurrentTeam Trait
+
+Add to models that should be scoped by team:
+
+```php
+use Idoneo\CmsCore\Traits\BelongsToCurrentTeam;
+
+class Project extends Model
+{
+    use BelongsToCurrentTeam;
+}
+```
+
+This automatically:
+- Filters queries by `current_team_id`
+- Sets `team_id` on create
+- Provides `forTeam()` and `withoutTeamScope()` methods
+
+### TeamSwitcher Component
+
+Include in your Blade views:
+
+```blade
+@if(\Idoneo\CmsCore\CmsCore::teamsEnabled())
+    <livewire:cms-core::team-switcher />
+@endif
+```
+
+### Filament Plugin
+
+Register in your Panel Provider:
+
+```php
+use Idoneo\CmsCore\Filament\CmsCorePlugin;
+
+public function panel(Panel $panel): Panel
+{
+    return $panel
+        ->plugins([
+            CmsCorePlugin::make(),
+        ]);
+}
+```
+
+### Helper Methods
+
+```php
+use Idoneo\CmsCore\CmsCore;
+
+// Check if teams are enabled
+CmsCore::teamsEnabled();
+
+// Get configured models
+CmsCore::teamModel();
+CmsCore::userModel();
+```
+
+### Panel Access Control
+
+By default, all authenticated users can access the Filament panel. To restrict access, implement `FilamentUser` in your User model:
+
+```php
+use Filament\Models\Contracts\FilamentUser;
+use Filament\Panel;
+
+class User extends Authenticatable implements FilamentUser
+{
+    public function canAccessPanel(Panel $panel): bool
+    {
+        // Allow all authenticated users (default behavior)
+        return true;
+        
+        // Or restrict by email domain
+        // return str_ends_with($this->email, '@yourdomain.com');
+        
+        // Or use roles with Spatie Permission
+        // return $this->hasRole('admin');
+    }
+}
+```
+
+## Requirements
+
+- PHP ^8.2
+- Laravel ^11.0 | ^12.0
+- Livewire ^3.0
+- Laravel Jetstream with Teams (recommended)
 
 ## Security Vulnerabilities
 
-If you discover a security vulnerability within CMS-Core, please send an e-mail to Diego Mascarenhas Goytía via [diego.mascarenhas@icloud.com](mailto:diego.mascarenhas@icloud.com). All security vulnerabilities will be promptly addressed.
+If you discover a security vulnerability, please send an e-mail to Diego Mascarenhas Goytía via [diego.mascarenhas@icloud.com](mailto:diego.mascarenhas@icloud.com). All security vulnerabilities will be promptly addressed.
 
 ## License
 
-CMS-Core is open-sourced software licensed under the [GNU Affero General Public License v3.0](https://www.gnu.org/licenses/agpl-3.0.html).
+Licensed under the [GNU Affero General Public License v3.0 (AGPL-3.0)](https://www.gnu.org/licenses/agpl-3.0.html).
 
 ### Additional Terms
 
-By deploying this software, you agree to notify the original author at [diego.mascarenhas@icloud.com](mailto:diego.mascarenhas@icloud.com) or by visiting [linkedin.com/in/diego-mascarenhas](http://linkedin.com/in/diego-mascarenhas/). Any modifications or enhancements must be shared with the original author.
+By deploying this software, you agree to notify the original author at [diego.mascarenhas@icloud.com](mailto:diego.mascarenhas@icloud.com) or by visiting [linkedin.com/in/diego-mascarenhas](https://linkedin.com/in/diego-mascarenhas/). Any modifications or enhancements must be shared with the original author.

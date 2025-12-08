@@ -1,6 +1,6 @@
 <div class="py-1">
     <div class="px-4 py-2 text-xs text-gray-400 uppercase tracking-wider">
-        Equipos
+        {{ __('Teams') }}
     </div>
     @foreach($this->teams as $team)
         <button
@@ -20,5 +20,3 @@
         </button>
     @endforeach
 </div>
-
-
