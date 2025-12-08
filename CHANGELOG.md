@@ -2,6 +2,18 @@
 
 All notable changes to `cms-core` will be documented in this file.
 
+## v1.0.7 - 2024-12-08
+
+### Fixed
+- Configure Filament panel with ->default() and ->login() to properly register auth routes
+- Fixes "Route [login] not defined" error
+- Simplified authentication setup - Filament now handles all auth routing
+
+### Changed
+- AdminPanelProvider now includes ->default() and ->login() methods
+- Removed complex bootstrap/app.php modifications
+- Cleaner Filament authentication setup
+
 ## v1.0.6 - 2024-12-08
 
 ### Fixed

@@ -53,6 +53,9 @@ class InstallCommand extends Command
 
 		// Update app locale
 		$this->updateLocale();
+		
+		// Update bootstrap app.php
+		$this->updateBootstrapApp();
 		$this->newLine();
 
 		// Publish config
@@ -182,11 +185,19 @@ class InstallCommand extends Command
 			);
 		}
 
-		// Add plugin call
+		// Add default(), login() and plugin
+		$content = preg_replace(
+			'/(\->id\(\'admin\'\))(\s*\->)/s',
+			'$1' . "\n            ->default()\n            ->login()" . '$2',
+			$content,
+			1
+		);
+
 		$content = preg_replace(
 			'/(\->colors\(\[.*?\]\))(\s*\->)/s',
 			'$1' . "\n            ->plugin(CmsCorePlugin::make())" . '$2',
-			$content
+			$content,
+			1
 		);
 
 		file_put_contents($providerPath, $content);
@@ -343,5 +354,11 @@ class InstallCommand extends Command
 				$this->info('✓ APP_LOCALE=es added to .env');
 			}
 		}
+	}
+
+	protected function updateBootstrapApp(): void
+	{
+		// No longer needed - Filament handles authentication with ->default() and ->login()
+		$this->info('✓ Bootstrap app ready (Filament handles auth)');
 	}
 }
