@@ -56,12 +56,11 @@ class InstallCommand extends Command
 		]);
 		$this->info('✓ Config published');
 
-		// Publish migrations
+		// Publish Spatie Permission migrations
 		$this->call('vendor:publish', [
-			'--tag' => 'cms-core-migrations',
-			'--force' => true,
+			'--provider' => 'Spatie\Permission\PermissionServiceProvider',
 		]);
-		$this->info('✓ Migrations published');
+		$this->info('✓ Permission migrations published');
 
 		// Publish views
 		$this->call('vendor:publish', [

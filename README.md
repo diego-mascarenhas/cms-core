@@ -31,9 +31,10 @@ php artisan cms-core:install --fresh --seed
 
 This will:
 - Configure Jetstream with Livewire + Teams
-- Publish config files
-- Publish and run migrations
 - Install Filament panel
+- Publish Spatie Permission migrations
+- Publish CMS-Core config files
+- Run all migrations
 - Create admin user (hola@humano.app / Simplicity!)
 
 Build assets:

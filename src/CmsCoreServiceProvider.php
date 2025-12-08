@@ -57,11 +57,6 @@ class CmsCoreServiceProvider extends ServiceProvider
 				__DIR__ . '/../config/cms-core.php' => config_path('cms-core.php'),
 			], 'cms-core-config');
 
-			// Migrations
-			$this->publishes([
-				__DIR__ . '/../database/migrations' => database_path('migrations'),
-			], 'cms-core-migrations');
-
 			// Views
 			$this->publishes([
 				__DIR__ . '/../resources/views' => resource_path('views/vendor/cms-core'),
@@ -70,7 +65,6 @@ class CmsCoreServiceProvider extends ServiceProvider
 			// All publishables
 			$this->publishes([
 				__DIR__ . '/../config/cms-core.php' => config_path('cms-core.php'),
-				__DIR__ . '/../database/migrations' => database_path('migrations'),
 				__DIR__ . '/../resources/views' => resource_path('views/vendor/cms-core'),
 			], 'cms-core');
 		}
