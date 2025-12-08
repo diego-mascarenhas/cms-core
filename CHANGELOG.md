@@ -2,6 +2,52 @@
 
 All notable changes to `cms-core` will be documented in this file.
 
+## v1.2.0 - 2024-12-08
+
+### Added
+- Phone field (INT, nullable) to users table via migration
+- Data field (JSON, nullable) to users table for additional key-value storage
+- Dynamic Jetstream role selection in user forms (reads from JetstreamServiceProvider)
+- Role display column in users table with color-coded badges
+- Three default roles: Administrator (admin), Member (member), Viewer (viewer)
+
+### Changed
+- UserResource fully compatible with Filament 4 (removed deprecated BulkActionGroup)
+- Form fields now use flat structure instead of Section components
+- Password field repositioned next to Name field in user form
+- Role field spans full width with helper text
+- Default user role changed from 'editor' to 'viewer' (most restrictive)
+- Team model includes user_id in fillable array
+- DatabaseSeeder creates admin user with hola@humano.app / Simplicity!
+
+### Fixed
+- Compatibility with Filament 4 table and form components
+- Team creation now properly assigns user_id
+- Role assignment correctly stored in team_user pivot table
+- User model includes phone and data in fillable with proper casts
+
+### Technical
+- Role colors: admin (green), member (blue), viewer (yellow)
+- KeyValue component for data field (JSON key-value pairs)
+- Roles loaded dynamically from Jetstream::$roles
+- CreateUser and EditUser pages handle role assignment automatically
+
+## v1.1.0 - 2024-12-08
+
+### Added
+- User management resource in Filament admin panel
+- Complete CRUD for users with roles and permissions
+- Filter users by role
+- Suggested team roles: Admin, Member, Viewer (more generic than Editor)
+
+### Features
+- UserResource automatically registered in admin panel
+- Users menu item with icon
+- Create, edit, delete users from admin panel
+- Assign roles and permissions directly in the UI
+- Search and sort users
+- Email verification status display
+
 ## v1.0.7 - 2024-12-08
 
 ### Fixed

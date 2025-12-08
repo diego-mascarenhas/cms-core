@@ -169,6 +169,39 @@ CmsCore::teamModel();
 CmsCore::userModel();
 ```
 
+### Team Roles Configuration
+
+After installation, configure team roles in `app/Providers/JetstreamServiceProvider.php`:
+
+```php
+protected function configurePermissions(): void
+{
+    Jetstream::defaultApiTokenPermissions(['read']);
+
+    Jetstream::role('admin', 'Administrator', [
+        'create',
+        'read',
+        'update',
+        'delete',
+    ])->description('Administrator users can perform any action.');
+
+    Jetstream::role('member', 'Member', [
+        'read',
+        'create',
+        'update',
+    ])->description('Members have standard access to create and manage content.');
+
+    Jetstream::role('viewer', 'Viewer', [
+        'read',
+    ])->description('Viewers can only read and view content.');
+}
+```
+
+These are **suggested roles** that work for most use cases. You can customize them:
+- Rename roles (e.g., "member" → "employee", "student", "collaborator")
+- Add new roles
+- Modify permissions per role
+
 ### Panel Access Control
 
 By default, all authenticated users can access the Filament panel. To restrict access, implement `FilamentUser` in your User model:

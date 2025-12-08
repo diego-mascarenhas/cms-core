@@ -17,7 +17,11 @@ class CmsCorePlugin implements Plugin
 
 	public function register(Panel $panel): void
 	{
-		$panel->userMenuItems($this->getUserMenuItems());
+		$panel
+			->userMenuItems($this->getUserMenuItems())
+			->resources([
+				\Idoneo\CmsCore\Filament\Resources\UserResource::class,
+			]);
 	}
 
 	public function boot(Panel $panel): void
@@ -74,4 +78,3 @@ class CmsCorePlugin implements Plugin
 		return $items;
 	}
 }
-
