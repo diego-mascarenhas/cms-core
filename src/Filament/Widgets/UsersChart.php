@@ -10,7 +10,7 @@ class UsersChart extends ChartWidget
 
 	public function getHeading(): ?string
 	{
-		return 'Crecimiento de Usuarios';
+		return __('User Growth');
 	}
 
 	protected function getData(): array
@@ -20,7 +20,7 @@ class UsersChart extends ChartWidget
 		return [
 			'datasets' => [
 				[
-					'label' => 'Usuarios registrados',
+					'label' => __('Registered users'),
 					'data' => $data['counts'],
 					'borderColor' => 'rgb(59, 130, 246)',
 					'backgroundColor' => 'rgba(59, 130, 246, 0.1)',

@@ -53,7 +53,7 @@ class InstallCommand extends Command
 
 		// Update app locale
 		$this->updateLocale();
-		
+
 		// Update bootstrap app.php
 		$this->updateBootstrapApp();
 		$this->newLine();
@@ -77,6 +77,13 @@ class InstallCommand extends Command
 			'--force' => true,
 		]);
 		$this->info('✓ Views published');
+
+		// Publish translations
+		$this->call('vendor:publish', [
+			'--tag' => 'cms-core-lang',
+			'--force' => true,
+		]);
+		$this->info('✓ Translations published');
 
 		// Run migrations
 		if ($this->option('fresh'))

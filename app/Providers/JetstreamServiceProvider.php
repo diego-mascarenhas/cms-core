@@ -58,8 +58,8 @@ class JetstreamServiceProvider extends ServiceProvider
             'update',
         ])->description('Member users have the ability to read, create, and update.');
 
-        Jetstream::role('viewer', 'Viewer', [
+        Jetstream::role('guest', 'Guest', [
             'read',
-        ])->description('Viewer users can only read content.');
+        ])->description('Guest users can only read content.');
     }
 }

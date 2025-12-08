@@ -29,6 +29,7 @@ class CmsCoreServiceProvider extends ServiceProvider
 		$this->registerCommands();
 		$this->registerPublishables();
 		$this->registerViews();
+		$this->registerTranslations();
 		$this->registerLivewireComponents();
 	}
 
@@ -62,10 +63,16 @@ class CmsCoreServiceProvider extends ServiceProvider
 				__DIR__ . '/../resources/views' => resource_path('views/vendor/cms-core'),
 			], 'cms-core-views');
 
+			// Translations
+			$this->publishes([
+				__DIR__ . '/../resources/lang' => $this->app->langPath('vendor/cms-core'),
+			], 'cms-core-lang');
+
 			// All publishables
 			$this->publishes([
 				__DIR__ . '/../config/cms-core.php' => config_path('cms-core.php'),
 				__DIR__ . '/../resources/views' => resource_path('views/vendor/cms-core'),
+				__DIR__ . '/../resources/lang' => $this->app->langPath('vendor/cms-core'),
 			], 'cms-core');
 		}
 	}
@@ -76,6 +83,14 @@ class CmsCoreServiceProvider extends ServiceProvider
 	protected function registerViews(): void
 	{
 		$this->loadViewsFrom(__DIR__ . '/../resources/views', 'cms-core');
+	}
+
+	/**
+	 * Register package translations.
+	 */
+	protected function registerTranslations(): void
+	{
+		$this->loadJsonTranslationsFrom(__DIR__ . '/../resources/lang');
 	}
 
 	/**

@@ -53,18 +53,18 @@ class CmsCorePlugin implements Plugin
 	{
 		$items = [];
 
-		// Mi Perfil
-		$items['profile'] = MenuItem::make()
-			->label(__('Mi Perfil'))
-			->url(fn (): string => route('profile.show'))
-			->icon('heroicon-o-user');
-
 		// Team-related items (only if teams are enabled)
 		if (CmsCore::teamsEnabled())
 		{
-			// Ajustes del Equipo
+			// Profile
+			$items['profile'] = MenuItem::make()
+				->label(__('Profile'))
+				->url(fn (): string => route('profile.show'))
+				->icon('heroicon-o-user');
+
+			// Team Settings
 			$items['team-settings'] = MenuItem::make()
-				->label(__('Ajustes del Equipo'))
+				->label(__('Team Settings'))
 				->url(fn (): string => auth()->check() && auth()->user()->currentTeam
 					? route('teams.show', auth()->user()->currentTeam)
 					: '#'
@@ -72,9 +72,9 @@ class CmsCorePlugin implements Plugin
 				->icon('heroicon-o-cog-6-tooth')
 				->visible(fn (): bool => auth()->check() && auth()->user()->currentTeam !== null);
 
-			// Crear Nuevo Equipo
+			// Create New Team
 			$items['create-team'] = MenuItem::make()
-				->label(__('Crear Nuevo Equipo'))
+				->label(__('Create New Team'))
 				->url(fn (): string => route('teams.create'))
 				->icon('heroicon-o-plus-circle');
 		}

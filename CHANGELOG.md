@@ -2,6 +2,23 @@
 
 All notable changes to `cms-core` will be documented in this file.
 
+## v1.2.3 - 2024-12-08
+
+### Added
+- Spanish translation file (resources/lang/es.json) with all UI labels
+- Translation support via __() for all user-facing text
+- registerTranslations() method in CmsCoreServiceProvider to load translations
+
+### Changed
+- All labels, comments and variables now in English with translation support via __()
+- Default role changed from 'viewer' to 'guest' across all files
+- Custom Dashboard page without header widgets and empty heading
+- Profile menu item now hidden when APP_TEAMS is disabled
+- Navigation label for dashboard uses __('Dashboard')
+
+### Fixed
+- Widget registration moved from plugin to Dashboard page to avoid Livewire component errors
+
 ## v1.2.2 - 2024-12-08
 
 ### Fixed

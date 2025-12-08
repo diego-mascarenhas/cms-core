@@ -23,17 +23,17 @@ class UserResource extends Resource
 
 	public static function getNavigationLabel(): string
 	{
-		return 'Usuarios';
+		return __('Users');
 	}
 
 	public static function getModelLabel(): string
 	{
-		return 'Usuario';
+		return __('User');
 	}
 
 	public static function getPluralModelLabel(): string
 	{
-		return 'Usuarios';
+		return __('Users');
 	}
 
 	public static function form(Schema $schema): Schema
@@ -41,32 +41,32 @@ class UserResource extends Resource
 		return $schema
 			->schema([
 				Forms\Components\TextInput::make('name')
-					->label('Nombre')
+					->label(__('Name'))
 					->required()
 					->maxLength(255),
 
 				Forms\Components\TextInput::make('password')
-					->label('Contraseña')
+					->label(__('Password'))
 					->password()
 					->dehydrated(fn ($state) => filled($state))
 					->required(fn (string $context): bool => $context === 'create')
 					->maxLength(255),
 
 				Forms\Components\TextInput::make('email')
-					->label('Correo electrónico')
+					->label(__('Email'))
 					->email()
 					->required()
 					->unique(ignoreRecord: true)
 					->maxLength(255),
 
 				Forms\Components\TextInput::make('phone')
-					->label('Teléfono')
+					->label(__('Phone'))
 					->numeric()
 					->maxLength(20)
 					->nullable(),
 
 				Forms\Components\Select::make('role')
-					->label('Rol')
+					->label(__('Role'))
 					->options(function () {
 						return collect(Jetstream::$roles)->mapWithKeys(function ($role) {
 							return [$role->key => $role->name];
@@ -74,14 +74,14 @@ class UserResource extends Resource
 					})
 				->default(function () {
 					$roles = Jetstream::$roles;
-					return !empty($roles) ? $roles[array_key_last($roles)]->key : 'viewer';
+					return !empty($roles) ? $roles[array_key_last($roles)]->key : 'guest';
 				})
 					->required()
-					->helperText('El rol se asigna al equipo personal del usuario')
+					->helperText(__('Role is assigned to user personal team'))
 					->columnSpanFull(),
 
 				Forms\Components\KeyValue::make('data')
-					->label('Datos adicionales')
+					->label(__('Additional Data'))
 					->nullable()
 					->columnSpanFull(),
 			])
@@ -93,22 +93,22 @@ class UserResource extends Resource
 		return $table
 			->columns([
 				Tables\Columns\TextColumn::make('name')
-					->label('Nombre')
+					->label(__('Name'))
 					->searchable()
 					->sortable(),
 
 				Tables\Columns\TextColumn::make('email')
-					->label('Correo electrónico')
+					->label(__('Email'))
 					->searchable()
 					->sortable(),
 
 			Tables\Columns\TextColumn::make('phone')
-				->label('Teléfono')
+				->label(__('Phone'))
 				->searchable()
 				->sortable(),
 
-		Tables\Columns\TextColumn::make('role')
-			->label('Rol')
+			Tables\Columns\TextColumn::make('role')
+				->label(__('Role'))
 			->badge()
 			->color(function (string $state): string {
 				$colors = [

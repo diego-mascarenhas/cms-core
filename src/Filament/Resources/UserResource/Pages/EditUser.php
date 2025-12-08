@@ -14,7 +14,7 @@ class EditUser extends EditRecord
 	protected function mutateFormDataBeforeFill(array $data): array
 	{
 		// Get default role from Jetstream
-		$defaultRole = !empty(Jetstream::$roles) ? Jetstream::$roles[array_key_last(Jetstream::$roles)]->key : 'viewer';
+		$defaultRole = !empty(Jetstream::$roles) ? Jetstream::$roles[array_key_last(Jetstream::$roles)]->key : 'guest';
 
 		// Load current role from team_user pivot table
 		$user = $this->record;
@@ -34,7 +34,7 @@ class EditUser extends EditRecord
 	protected function mutateFormDataBeforeSave(array $data): array
 	{
 		// Get default role from Jetstream
-		$defaultRole = !empty(Jetstream::$roles) ? Jetstream::$roles[array_key_last(Jetstream::$roles)]->key : 'viewer';
+		$defaultRole = !empty(Jetstream::$roles) ? Jetstream::$roles[array_key_last(Jetstream::$roles)]->key : 'guest';
 
 		// Store role temporarily
 		$this->cachedRole = $data['role'] ?? $defaultRole;
@@ -50,7 +50,7 @@ class EditUser extends EditRecord
 		$user = $this->record;
 
 		// Get default role from Jetstream
-		$defaultRole = !empty(Jetstream::$roles) ? Jetstream::$roles[array_key_last(Jetstream::$roles)]->key : 'viewer';
+		$defaultRole = !empty(Jetstream::$roles) ? Jetstream::$roles[array_key_last(Jetstream::$roles)]->key : 'guest';
 
 		// Update user's role in their current team
 		if ($user->currentTeam)

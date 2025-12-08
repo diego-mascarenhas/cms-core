@@ -16,8 +16,8 @@ class UserStatsOverview extends BaseWidget
 
 		// Total Users
 		$totalUsers = $userModel::count();
-		$stats[] = Stat::make('Total Usuarios', $totalUsers)
-			->description('Usuarios registrados en el sistema')
+		$stats[] = Stat::make(__('Total Users'), $totalUsers)
+			->description(__('Registered users in the system'))
 			->descriptionIcon('heroicon-m-users')
 			->color('primary')
 			->chart($this->getUsersChartData());
@@ -25,8 +25,8 @@ class UserStatsOverview extends BaseWidget
 		// Verified Users
 		$verifiedUsers = $userModel::whereNotNull('email_verified_at')->count();
 		$verificationRate = $totalUsers > 0 ? round(($verifiedUsers / $totalUsers) * 100) : 0;
-		$stats[] = Stat::make('Usuarios Verificados', $verifiedUsers)
-			->description("{$verificationRate}% verificados")
+		$stats[] = Stat::make(__('Verified Users'), $verifiedUsers)
+			->description("{$verificationRate}% " . __('verified'))
 			->descriptionIcon('heroicon-m-check-badge')
 			->color('success');
 
@@ -37,7 +37,7 @@ class UserStatsOverview extends BaseWidget
 			{
 				$roleCount = $this->getUsersByRole($role->key);
 				$stats[] = Stat::make(ucfirst($role->name), $roleCount)
-					->description("Rol: {$role->name}")
+					->description(__('Role') . ": {$role->name}")
 					->descriptionIcon('heroicon-m-user-circle')
 					->color($this->getRoleColor($role->key));
 			}
@@ -47,8 +47,8 @@ class UserStatsOverview extends BaseWidget
 		$newUsersThisMonth = $userModel::whereMonth('created_at', now()->month)
 			->whereYear('created_at', now()->year)
 			->count();
-		$stats[] = Stat::make('Nuevos Este Mes', $newUsersThisMonth)
-			->description('Usuarios registrados este mes')
+		$stats[] = Stat::make(__('New This Month'), $newUsersThisMonth)
+			->description(__('Users registered this month'))
 			->descriptionIcon('heroicon-m-arrow-trending-up')
 			->color('info');
 
@@ -75,7 +75,7 @@ class UserStatsOverview extends BaseWidget
 		{
 			'admin' => 'success',
 			'member' => 'info',
-			'viewer' => 'warning',
+			'guest' => 'warning',
 			default => 'gray',
 		};
 	}
