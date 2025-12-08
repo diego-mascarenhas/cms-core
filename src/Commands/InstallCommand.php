@@ -182,10 +182,10 @@ class InstallCommand extends Command
 			);
 		}
 
-		// Add plugin call and locale
+		// Add plugin call
 		$content = preg_replace(
 			'/(\->colors\(\[.*?\]\))(\s*\->)/s',
-			'$1' . "\n            ->locale('es')\n            ->plugin(CmsCorePlugin::make())" . '$2',
+			'$1' . "\n            ->plugin(CmsCorePlugin::make())" . '$2',
 			$content
 		);
 
@@ -315,14 +315,26 @@ class InstallCommand extends Command
 
 		$content = file_get_contents($appConfigPath);
 
-		// Update locale to Spanish
+		// Update locale default to Spanish
 		$content = preg_replace(
-			"/'locale' => '.*?'/",
-			"'locale' => 'es'",
+			"/'locale' => env\('APP_LOCALE', '.*?'\)/",
+			"'locale' => env('APP_LOCALE', 'es')",
 			$content
 		);
 
 		file_put_contents($appConfigPath, $content);
-		$this->info('✓ App locale set to Spanish');
+		$this->info('✓ App locale default set to Spanish');
+		
+		// Update .env file
+		$envPath = base_path('.env');
+		if (file_exists($envPath))
+		{
+			$envContent = file_get_contents($envPath);
+			if (!str_contains($envContent, 'APP_LOCALE='))
+			{
+				file_put_contents($envPath, $envContent . "\nAPP_LOCALE=es\n");
+				$this->info('✓ APP_LOCALE=es added to .env');
+			}
+		}
 	}
 }
