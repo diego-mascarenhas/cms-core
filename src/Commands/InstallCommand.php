@@ -71,6 +71,13 @@ class InstallCommand extends Command
 		]);
 		$this->info('✓ Permission migrations published');
 
+		// Publish CMS Core migrations
+		$this->call('vendor:publish', [
+			'--tag' => 'cms-core-migrations',
+			'--force' => true,
+		]);
+		$this->info('✓ CMS Core migrations published');
+
 		// Publish views
 		$this->call('vendor:publish', [
 			'--tag' => 'cms-core-views',
@@ -113,7 +120,7 @@ class InstallCommand extends Command
 
 		$this->comment('Next steps:');
 		$this->line('  1. Run: npm install && npm run build');
-		$this->line('  2. Add APP_TEAMS=true to .env to enable teams feature');
+		$this->line('  2. Add APP_TEAMS=true to .env if you need multi-tenant mode (default: false)');
 		$this->line('  3. Access admin panel at: /admin');
 
 		if ($this->option('seed'))
@@ -182,7 +189,7 @@ class InstallCommand extends Command
 			return;
 		}
 
-		// Add use statement
+		// Add use statements for plugin and custom dashboard
 		if (!str_contains($content, 'use Idoneo\CmsCore\Filament\CmsCorePlugin;'))
 		{
 			$content = str_replace(
@@ -191,6 +198,27 @@ class InstallCommand extends Command
 				$content
 			);
 		}
+
+		// Replace default Dashboard with custom one
+		$content = str_replace(
+			'use Filament\Pages\Dashboard;',
+			'use Idoneo\CmsCore\Filament\Pages\Dashboard;',
+			$content
+		);
+
+		// Replace Dashboard::class in pages array
+		$content = str_replace(
+			'->pages([' . "\n" . '                Dashboard::class,',
+			'->pages([' . "\n" . '                \Idoneo\CmsCore\Filament\Pages\Dashboard::class,',
+			$content
+		);
+
+		// Remove default widgets (AccountWidget and FilamentInfoWidget)
+		$content = preg_replace(
+			'/->widgets\(\[\s*AccountWidget::class,\s*FilamentInfoWidget::class,\s*\]\)/s',
+			'->widgets([' . "\n" . '                // Dashboard widgets are registered by CmsCorePlugin' . "\n" . '            ])',
+			$content
+		);
 
 		// Add default(), login() and plugin
 		$content = preg_replace(
@@ -264,8 +292,28 @@ class InstallCommand extends Command
 			);
 		}
 
+		// Add phone and data to fillable array if not already present
+		if (!str_contains($content, "'phone'") && str_contains($content, 'protected $fillable'))
+		{
+			$content = preg_replace(
+				"/(protected \\\$fillable\s*=\s*\[)/",
+				"$1\n        'phone',\n        'data',",
+				$content
+			);
+		}
+
+		// Add data to casts array if not already present
+		if (!str_contains($content, "'data'") && str_contains($content, 'protected $casts'))
+		{
+			$content = preg_replace(
+				"/(protected function casts\(\): array\s*\{\s*return\s*\[)/",
+				"$1\n            'data' => 'array',",
+				$content
+			);
+		}
+
 		file_put_contents($userModelPath, $content);
-		$this->info('✓ User model updated with FilamentUser and HasRoles');
+		$this->info('✓ User model updated with FilamentUser, HasRoles, phone and data fields');
 	}
 
 	protected function updateWebRoutes(): void

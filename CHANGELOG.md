@@ -2,6 +2,23 @@
 
 All notable changes to `cms-core` will be documented in this file.
 
+## v1.2.4 - 2024-12-08
+
+### Added
+- Migrations publishing via 'cms-core-migrations' tag
+- Install command now publishes CMS Core migrations automatically
+
+### Changed
+- APP_TEAMS now defaults to false (single-tenant mode) instead of requiring explicit configuration
+- Updated installation instructions to reflect new default behavior
+
+### Fixed
+- Install command now properly configures custom Dashboard page in AdminPanelProvider
+- Install command removes default Filament widgets (AccountWidget, FilamentInfoWidget)
+- Install command now adds 'phone' and 'data' to User model $fillable
+- Install command now adds 'data' => 'array' cast to User model
+- Phone field uses bigInteger type for numeric phone storage
+
 ## v1.2.3 - 2024-12-08
 
 ### Added

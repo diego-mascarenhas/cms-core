@@ -68,11 +68,17 @@ class CmsCoreServiceProvider extends ServiceProvider
 				__DIR__ . '/../resources/lang' => $this->app->langPath('vendor/cms-core'),
 			], 'cms-core-lang');
 
+			// Migrations
+			$this->publishes([
+				__DIR__ . '/../database/migrations' => database_path('migrations'),
+			], 'cms-core-migrations');
+
 			// All publishables
 			$this->publishes([
 				__DIR__ . '/../config/cms-core.php' => config_path('cms-core.php'),
 				__DIR__ . '/../resources/views' => resource_path('views/vendor/cms-core'),
 				__DIR__ . '/../resources/lang' => $this->app->langPath('vendor/cms-core'),
+				__DIR__ . '/../database/migrations' => database_path('migrations'),
 			], 'cms-core');
 		}
 	}

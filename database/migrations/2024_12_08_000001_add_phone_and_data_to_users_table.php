@@ -13,7 +13,7 @@ return new class extends Migration
 	{
 		Schema::table('users', function (Blueprint $table)
 		{
-			$table->integer('phone')->nullable()->after('email');
+			$table->bigInteger('phone')->nullable()->after('email');
 			$table->json('data')->nullable()->after('phone');
 		});
 	}
