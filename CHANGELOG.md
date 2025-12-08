@@ -2,6 +2,18 @@
 
 All notable changes to `cms-core` will be documented in this file.
 
+## v1.2.1 - 2024-12-08
+
+### Added
+- Dashboard widgets with user statistics
+- UserStatsOverview widget showing total users, verified users, users by role, and new users this month
+- UsersChart widget displaying user growth over last 6 months
+- Automatic registration of widgets in CmsCorePlugin
+
+### Changed
+- Removed default Filament widgets (AccountWidget, FilamentInfoWidget) from AdminPanelProvider
+- Dashboard now shows user-focused statistics instead of generic information
+
 ## v1.2.0 - 2024-12-08
 
 ### Added
