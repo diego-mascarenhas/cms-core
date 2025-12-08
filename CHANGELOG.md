@@ -2,6 +2,19 @@
 
 All notable changes to `cms-core` will be documented in this file.
 
+## v1.0.2 - 2024-12-08
+
+### Fixed
+- Always create personal team for admin user (Jetstream requirement)
+- Fixed null pointer error when accessing currentTeam in navigation
+- Clarified that APP_TEAMS only controls UI visibility, not team creation
+
+### Changed
+- Updated documentation to explain APP_TEAMS behavior:
+  - Users always have a personal team (Jetstream technical requirement)
+  - APP_TEAMS=false only hides team UI (switcher, create team, settings)
+  - APP_TEAMS=true shows all team features for multi-tenant usage
+
 ## v1.0.1 - 2024-12-08
 
 ### Fixed

@@ -4,12 +4,17 @@ return [
 
 	/*
 	|--------------------------------------------------------------------------
-	| Teams Feature
+	| Teams Feature UI Visibility
 	|--------------------------------------------------------------------------
 	|
-	| Enable or disable the teams functionality. When disabled, all team-related
-	| UI elements will be hidden (team switcher, team settings, create team).
-	| The underlying team structure remains for future activation.
+	| Controls the visibility of team-related UI elements. When set to false,
+	| team switcher, create team, and team settings options are hidden.
+	|
+	| IMPORTANT: Users always have a personal team (Jetstream requirement).
+	| This setting ONLY controls UI visibility, not the underlying functionality.
+	|
+	| When false: Single-tenant mode (personal team only, UI hidden)
+	| When true: Multi-tenant mode (create/switch teams, full UI visible)
 	|
 	*/
 

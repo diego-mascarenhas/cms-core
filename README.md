@@ -91,9 +91,22 @@ After running with `--seed` flag:
 Add to your `.env` file:
 
 ```env
-# Enable teams feature (default: false)
-APP_TEAMS=true
+# Show/hide teams UI features (default: false)
+# Note: Users always have a personal team (Jetstream requirement)
+# This setting only controls UI visibility (team switcher, create team, team settings)
+APP_TEAMS=false
 ```
+
+When `APP_TEAMS=false`:
+- ✅ Users still have a personal team (required by Jetstream)
+- ❌ Team switcher is hidden
+- ❌ "Create New Team" option is hidden
+- ❌ "Team Settings" option is hidden
+
+When `APP_TEAMS=true`:
+- ✅ All team features visible
+- ✅ Users can create multiple teams
+- ✅ Team switcher appears in user menu
 
 ## Usage
 

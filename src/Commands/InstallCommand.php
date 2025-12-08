@@ -131,8 +131,8 @@ class InstallCommand extends Command
 			'email_verified_at' => now(),
 		]);
 
-		// Create personal team if teams are enabled
-		if (config('cms-core.teams_enabled', false) && method_exists($user, 'ownedTeams'))
+		// Create personal team (Jetstream requires it)
+		if (method_exists($user, 'ownedTeams'))
 		{
 			$team = $teamModel::forceCreate([
 				'user_id' => $user->id,
@@ -144,7 +144,7 @@ class InstallCommand extends Command
 			$user->save();
 		}
 
-		$this->info('  ✓ Admin user created');
+		$this->info('  ✓ Admin user created with personal team');
 	}
 
 	protected function registerPlugin(): void
