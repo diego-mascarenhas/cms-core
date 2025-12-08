@@ -2,6 +2,13 @@
 
 All notable changes to `cms-core` will be documented in this file.
 
+## v1.0.6 - 2024-12-08
+
+### Fixed
+- Disable Fortify views to prevent Jetstream login from being accessible
+- Forces all authentication to go through Filament panel at /admin/login
+- Users are now always redirected to Filament's login page
+
 ## v1.0.5 - 2024-12-08
 
 ### Fixed

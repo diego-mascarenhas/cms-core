@@ -299,8 +299,15 @@ class InstallCommand extends Command
 			$content
 		);
 
+		// Disable Fortify views to use only Filament login
+		$content = preg_replace(
+			"/'views' => true/",
+			"'views' => false",
+			$content
+		);
+
 		file_put_contents($fortifyPath, $content);
-		$this->info('✓ Fortify configured to use /admin');
+		$this->info('✓ Fortify configured to use Filament login');
 	}
 
 	protected function updateLocale(): void
