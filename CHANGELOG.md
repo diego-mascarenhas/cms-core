@@ -2,6 +2,19 @@
 
 All notable changes to `cms-core` will be documented in this file.
 
+## v1.0.5 - 2024-12-08
+
+### Fixed
+- Improved locale configuration to add APP_LOCALE=es to .env file
+- Better regex pattern for updating app.php locale config
+
+## v1.0.4 - 2024-12-08
+
+### Fixed
+- Removed invalid ->locale() method call in Filament panel
+- Fixed locale configuration to use config/app.php properly
+- Locale now properly inherited from Laravel app config
+
 ## v1.0.3 - 2024-12-08
 
 ### Added

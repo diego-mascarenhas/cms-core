@@ -44,13 +44,13 @@ class InstallCommand extends Command
 
 		// Update User model
 		$this->updateUserModel();
-		
+
 		// Update web routes
 		$this->updateWebRoutes();
-		
+
 		// Update Fortify config to use Filament login
 		$this->updateFortifyConfig();
-		
+
 		// Update app locale
 		$this->updateLocale();
 		$this->newLine();
@@ -324,7 +324,7 @@ class InstallCommand extends Command
 
 		file_put_contents($appConfigPath, $content);
 		$this->info('✓ App locale default set to Spanish');
-		
+
 		// Update .env file
 		$envPath = base_path('.env');
 		if (file_exists($envPath))
