@@ -2,6 +2,18 @@
 
 All notable changes to `cms-core` will be documented in this file.
 
+## v1.0.3 - 2024-12-08
+
+### Added
+- Auto-configure Spanish locale for application and Filament panel
+- Configure Fortify to redirect to /admin after authentication
+- Set Filament login as default authentication (instead of Jetstream)
+
+### Fixed
+- Authentication now uses Filament login at /admin/login
+- Application locale properly set to Spanish (es)
+- Root route redirects to /admin for immediate panel access
+
 ## v1.0.2 - 2024-12-08
 
 ### Fixed

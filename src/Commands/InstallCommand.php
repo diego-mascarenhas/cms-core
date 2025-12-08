@@ -7,8 +7,8 @@ use Illuminate\Support\Facades\Hash;
 
 class InstallCommand extends Command
 {
-	protected $signature = 'cms-core:install 
-		{--fresh : Run fresh migrations} 
+	protected $signature = 'cms-core:install
+		{--fresh : Run fresh migrations}
 		{--seed : Create admin user}
 		{--skip-jetstream : Skip Jetstream installation}';
 
@@ -38,15 +38,21 @@ class InstallCommand extends Command
 			'--panels' => true,
 		]);
 		$this->info('✓ Filament panel installed');
-		
+
 		// Register CmsCore plugin in AdminPanelProvider
 		$this->registerPlugin();
-		
+
 		// Update User model
 		$this->updateUserModel();
 		
 		// Update web routes
 		$this->updateWebRoutes();
+		
+		// Update Fortify config to use Filament login
+		$this->updateFortifyConfig();
+		
+		// Update app locale
+		$this->updateLocale();
 		$this->newLine();
 
 		// Publish config
@@ -176,10 +182,10 @@ class InstallCommand extends Command
 			);
 		}
 
-		// Add plugin call
+		// Add plugin call and locale
 		$content = preg_replace(
 			'/(\->colors\(\[.*?\]\))(\s*\->)/s',
-			'$1' . "\n            ->plugin(CmsCorePlugin::make())" . '$2',
+			'$1' . "\n            ->locale('es')\n            ->plugin(CmsCorePlugin::make())" . '$2',
 			$content
 		);
 
@@ -272,5 +278,51 @@ class InstallCommand extends Command
 
 		file_put_contents($routesPath, $content);
 		$this->info('✓ Root route redirects to /admin');
+	}
+
+	protected function updateFortifyConfig(): void
+	{
+		$fortifyPath = config_path('fortify.php');
+
+		if (!file_exists($fortifyPath))
+		{
+			$this->warn('  fortify.php not found, skipping');
+			return;
+		}
+
+		$content = file_get_contents($fortifyPath);
+
+		// Update home redirect to /admin
+		$content = preg_replace(
+			"/'home' => '.*?'/",
+			"'home' => '/admin'",
+			$content
+		);
+
+		file_put_contents($fortifyPath, $content);
+		$this->info('✓ Fortify configured to use /admin');
+	}
+
+	protected function updateLocale(): void
+	{
+		$appConfigPath = config_path('app.php');
+
+		if (!file_exists($appConfigPath))
+		{
+			$this->warn('  app.php not found, skipping');
+			return;
+		}
+
+		$content = file_get_contents($appConfigPath);
+
+		// Update locale to Spanish
+		$content = preg_replace(
+			"/'locale' => '.*?'/",
+			"'locale' => 'es'",
+			$content
+		);
+
+		file_put_contents($appConfigPath, $content);
+		$this->info('✓ App locale set to Spanish');
 	}
 }

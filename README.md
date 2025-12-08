@@ -31,9 +31,11 @@ php artisan cms-core:install --fresh --seed
 
 This will:
 - Configure Jetstream with Livewire + Teams
-- Install Filament panel
+- Install Filament panel (with Spanish locale)
 - Publish Spatie Permission migrations
 - Publish CMS-Core config files
+- Configure authentication to use Filament login
+- Set application locale to Spanish
 - Run all migrations
 - Create admin user (hola@humano.app / Simplicity!)
 
