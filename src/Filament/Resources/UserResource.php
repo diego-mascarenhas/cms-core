@@ -82,6 +82,8 @@ class UserResource extends Resource
 
 				Forms\Components\KeyValue::make('data')
 					->label(__('Additional Data'))
+					->default([])
+					->dehydrateStateUsing(fn ($state) => empty($state) ? null : $state)
 					->nullable()
 					->columnSpanFull(),
 			])

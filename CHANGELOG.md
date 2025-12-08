@@ -2,6 +2,11 @@
 
 All notable changes to `cms-core` will be documented in this file.
 
+## v1.2.5 - 2024-12-08
+
+### Fixed
+- KeyValue component for 'data' field now handles NULL values correctly with default([]) and proper dehydration
+
 ## v1.2.4 - 2024-12-08
 
 ### Added
