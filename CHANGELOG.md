@@ -2,6 +2,11 @@
 
 All notable changes to `cms-core` will be documented in this file.
 
+## v1.2.2 - 2024-12-08
+
+### Fixed
+- Added `laravel/sanctum` to package dependencies to ensure `HasApiTokens` exists during installs
+
 ## v1.2.1 - 2024-12-08
 
 ### Added
