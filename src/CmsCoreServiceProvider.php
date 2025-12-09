@@ -63,22 +63,34 @@ class CmsCoreServiceProvider extends ServiceProvider
 				__DIR__ . '/../resources/views' => resource_path('views/vendor/cms-core'),
 			], 'cms-core-views');
 
-		// Translations
+		// Translations (JSON files)
 		$this->publishes([
-			__DIR__ . '/../resources/lang' => $this->app->langPath(),
+			__DIR__ . '/../resources/lang/es.json' => $this->app->langPath('es.json'),
 		], 'cms-core-lang');
 
-			// Migrations
-			$this->publishes([
-				__DIR__ . '/../database/migrations' => database_path('migrations'),
-			], 'cms-core-migrations');
+		// Validation translations (PHP files)
+		$this->publishes([
+			__DIR__ . '/../resources/lang/es' => $this->app->langPath('es'),
+		], 'cms-core-lang');
+
+		// Migrations
+		$this->publishes([
+			__DIR__ . '/../database/migrations' => database_path('migrations'),
+		], 'cms-core-migrations');
+
+		// Seeders
+		$this->publishes([
+			__DIR__ . '/../database/seeders/DatabaseSeeder.php' => database_path('seeders/DatabaseSeeder.php'),
+		], 'cms-core-seeders');
 
 		// All publishables
 		$this->publishes([
 			__DIR__ . '/../config/cms-core.php' => config_path('cms-core.php'),
 			__DIR__ . '/../resources/views' => resource_path('views/vendor/cms-core'),
-			__DIR__ . '/../resources/lang' => $this->app->langPath(),
+			__DIR__ . '/../resources/lang/es.json' => $this->app->langPath('es.json'),
+			__DIR__ . '/../resources/lang/es' => $this->app->langPath('es'),
 			__DIR__ . '/../database/migrations' => database_path('migrations'),
+			__DIR__ . '/../database/seeders/DatabaseSeeder.php' => database_path('seeders/DatabaseSeeder.php'),
 		], 'cms-core');
 		}
 	}
@@ -97,6 +109,7 @@ class CmsCoreServiceProvider extends ServiceProvider
 	protected function registerTranslations(): void
 	{
 		$this->loadJsonTranslationsFrom(__DIR__ . '/../resources/lang');
+		$this->loadTranslationsFrom(__DIR__ . '/../resources/lang', 'cms-core');
 	}
 
 	/**

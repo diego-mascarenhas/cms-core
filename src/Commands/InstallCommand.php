@@ -42,11 +42,14 @@ class InstallCommand extends Command
 		// Register CmsCore plugin in AdminPanelProvider
 		$this->registerPlugin();
 
-		// Update User model
-		$this->updateUserModel();
+	// Update User model
+	$this->updateUserModel();
 
-		// Update web routes
-		$this->updateWebRoutes();
+	// Update Team model
+	$this->updateTeamModel();
+
+	// Update web routes
+	$this->updateWebRoutes();
 
 		// Update Fortify config to use Filament login
 		$this->updateFortifyConfig();
@@ -85,14 +88,21 @@ class InstallCommand extends Command
 		]);
 		$this->info('✓ Views published');
 
-		// Publish translations
-		$this->call('vendor:publish', [
-			'--tag' => 'cms-core-lang',
-			'--force' => true,
-		]);
-		$this->info('✓ Translations published');
+	// Publish translations
+	$this->call('vendor:publish', [
+		'--tag' => 'cms-core-lang',
+		'--force' => true,
+	]);
+	$this->info('✓ Translations published');
 
-		// Run migrations
+	// Publish seeders
+	$this->call('vendor:publish', [
+		'--tag' => 'cms-core-seeders',
+		'--force' => true,
+	]);
+	$this->info('✓ Seeders published');
+
+	// Run migrations
 		if ($this->option('fresh'))
 		{
 			$this->newLine();
@@ -314,6 +324,36 @@ class InstallCommand extends Command
 
 		file_put_contents($userModelPath, $content);
 		$this->info('✓ User model updated with FilamentUser, HasRoles, phone and data fields');
+	}
+
+	protected function updateTeamModel(): void
+	{
+		$teamModelPath = app_path('Models/Team.php');
+
+		if (!file_exists($teamModelPath))
+		{
+			$this->warn('  Team model not found, skipping update');
+			return;
+		}
+
+		$content = file_get_contents($teamModelPath);
+
+		// Check if user_id is already in fillable
+		if (str_contains($content, "'user_id'"))
+		{
+			$this->info('✓ Team model already updated');
+			return;
+		}
+
+		// Add user_id to fillable array after 'name'
+		$content = preg_replace(
+			"/(protected \\\$fillable\s*=\s*\[\s*'name',)/",
+			"$1\n        'user_id',",
+			$content
+		);
+
+		file_put_contents($teamModelPath, $content);
+		$this->info('✓ Team model updated with user_id in fillable');
 	}
 
 	protected function updateWebRoutes(): void

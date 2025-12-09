@@ -4,8 +4,24 @@ All notable changes to `cms-core` will be documented in this file.
 
 ## v1.2.6 - 2024-12-09
 
+### Added
+- DatabaseSeeder now publishes to application via 'cms-core-seeders' tag
+- Install command now updates Team model to add 'user_id' to fillable array
+- EditUser now creates personal team if missing when saving user
+- Comprehensive validation rules for all User form fields (name, email, password, phone, role)
+- Complete Spanish validation translations file (resources/lang/es/validation.php)
+- Custom validation messages for each field with proper Spanish translations
+- Phone field validation: minimum 10 characters, maximum 20 characters
+- Password field validation: minimum 8 characters
+- Name field validation: minimum 3 characters
+- Disabled HTML5 native validation using extraInputAttributes(['required' => false]) to prevent browser tooltips and show custom error messages below fields
+
 ### Fixed
 - Translation files now publish to correct path (lang/es.json instead of lang/vendor/cms-core/es.json)
+- Team model mass assignment error when creating users with personal teams
+- User role not saving when currentTeam was null in EditUser page
+- EditUser now uses syncWithoutDetaching instead of updateExistingPivot for better reliability
+- Table column labels now use translation keys instead of hardcoded Spanish text
 
 ## v1.2.5 - 2024-12-08
 

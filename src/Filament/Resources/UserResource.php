@@ -40,45 +40,76 @@ class UserResource extends Resource
 	{
 		return $schema
 			->schema([
-				Forms\Components\TextInput::make('name')
-					->label(__('Name'))
-					->required()
-					->maxLength(255),
+		Forms\Components\TextInput::make('name')
+			->label(__('Name'))
+			->required()
+			->minLength(3)
+			->maxLength(255)
+			->extraInputAttributes(['required' => false, 'minlength' => false, 'maxlength' => false])
+			->validationMessages([
+				'required' => __('validation.required'),
+				'min' => __('validation.min.string', ['min' => 3]),
+				'max' => __('validation.max.string', ['max' => 255]),
+			]),
 
-				Forms\Components\TextInput::make('password')
-					->label(__('Password'))
-					->password()
-					->dehydrated(fn ($state) => filled($state))
-					->required(fn (string $context): bool => $context === 'create')
-					->maxLength(255),
+		Forms\Components\TextInput::make('password')
+			->label(__('Password'))
+			->password()
+			->dehydrated(fn ($state) => filled($state))
+			->required(fn (string $context): bool => $context === 'create')
+			->minLength(8)
+			->maxLength(255)
+			->extraInputAttributes(['required' => false, 'minlength' => false, 'maxlength' => false])
+			->validationMessages([
+				'required' => __('validation.required'),
+				'min' => __('validation.min.string', ['min' => 8]),
+				'max' => __('validation.max.string', ['max' => 255]),
+			]),
 
-				Forms\Components\TextInput::make('email')
-					->label(__('Email'))
-					->email()
-					->required()
-					->unique(ignoreRecord: true)
-					->maxLength(255),
+		Forms\Components\TextInput::make('email')
+			->label(__('Email'))
+			->email()
+			->required()
+			->unique(ignoreRecord: true)
+			->maxLength(255)
+			->extraInputAttributes(['required' => false, 'maxlength' => false])
+			->validationMessages([
+				'required' => __('validation.required'),
+				'email' => __('validation.email'),
+				'unique' => __('validation.unique'),
+				'max' => __('validation.max.string', ['max' => 255]),
+			]),
 
-				Forms\Components\TextInput::make('phone')
-					->label(__('Phone'))
-					->numeric()
-					->maxLength(20)
-					->nullable(),
+		Forms\Components\TextInput::make('phone')
+			->label(__('Phone'))
+			->tel()
+			->minLength(10)
+			->maxLength(20)
+			->nullable()
+			->extraInputAttributes(['minlength' => false, 'maxlength' => false])
+			->validationMessages([
+				'min' => __('validation.min.string', ['min' => 10]),
+				'max' => __('validation.max.string', ['max' => 20]),
+			]),
 
-				Forms\Components\Select::make('role')
-					->label(__('Role'))
-					->options(function () {
-						return collect(Jetstream::$roles)->mapWithKeys(function ($role) {
-							return [$role->key => $role->name];
-						})->toArray();
-					})
-				->default(function () {
-					$roles = Jetstream::$roles;
-					return !empty($roles) ? $roles[array_key_last($roles)]->key : 'guest';
-				})
-					->required()
-					->helperText(__('Role is assigned to user personal team'))
-					->columnSpanFull(),
+		Forms\Components\Select::make('role')
+			->label(__('Role'))
+			->options(function () {
+				return collect(Jetstream::$roles)->mapWithKeys(function ($role) {
+					return [$role->key => $role->name];
+				})->toArray();
+			})
+		->default(function () {
+			$roles = Jetstream::$roles;
+			return !empty($roles) ? $roles[array_key_last($roles)]->key : 'guest';
+		})
+			->required()
+			->extraAttributes(['required' => false])
+			->helperText(__('Role is assigned to user personal team'))
+			->validationMessages([
+				'required' => __('validation.required'),
+			])
+			->columnSpanFull(),
 
 				Forms\Components\KeyValue::make('data')
 					->label(__('Additional Data'))
@@ -135,17 +166,17 @@ class UserResource extends Resource
 			return !empty(Jetstream::$roles) ? Jetstream::$roles[array_key_last(Jetstream::$roles)]->key : 'viewer';
 			}),
 
-			Tables\Columns\TextColumn::make('email_verified_at')
-				->label('Email verificado')
+		Tables\Columns\TextColumn::make('email_verified_at')
+			->label(__('Email Verified'))
+			->dateTime()
+			->sortable()
+			->toggleable(isToggledHiddenByDefault: true),
+
+			Tables\Columns\TextColumn::make('created_at')
+				->label(__('Created At'))
 				->dateTime()
 				->sortable()
 				->toggleable(isToggledHiddenByDefault: true),
-
-				Tables\Columns\TextColumn::make('created_at')
-					->label('Creado')
-					->dateTime()
-					->sortable()
-					->toggleable(isToggledHiddenByDefault: true),
 		])
 		->filters([
 			//

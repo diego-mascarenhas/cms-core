@@ -23,5 +23,16 @@
     "Administrator": "Administrador",
     "Member": "Miembro",
     "Guest": "Invitado",
-    "Viewer": "Visor"
+    "Viewer": "Visor",
+    "Email Verified": "Email Verificado",
+    "Created At": "Creado",
+    "validation.required": "Este campo es obligatorio.",
+    "validation.email": "Debe ser un correo electrónico válido.",
+    "validation.unique": "Este valor ya está en uso.",
+    "validation.min.string": "Debe tener al menos :min caracteres.",
+    "validation.max.string": "No debe exceder :max caracteres.",
+    "validation.numeric": "Debe ser un número.",
+    "validation.integer": "Debe ser un número entero.",
+    "validation.confirmed": "La confirmación no coincide.",
+    "validation.in": "El valor seleccionado no es válido."
 }
