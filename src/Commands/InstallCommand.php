@@ -371,18 +371,18 @@ class InstallCommand extends Command
 
 		$content = file_get_contents($providerPath);
 
-		// Check if already has the correct roles
-		if (str_contains($content, "Jetstream::role('member', 'Member'") && 
-			str_contains($content, "Jetstream::role('guest', 'Guest'"))
-		{
-			$this->info('✓ Jetstream roles already updated');
-			return;
-		}
+	// Check if already has the correct roles
+	if (str_contains($content, "Jetstream::role('member', 'Member'") &&
+		str_contains($content, "Jetstream::role('guest', 'Guest'"))
+	{
+		$this->info('✓ Jetstream roles already updated');
+		return;
+	}
 
-		// Replace old editor role with member + guest roles
-		$oldRolesPattern = "/Jetstream::role\('editor'.*?\)->description\('.*?'\);/s";
-		
-		$newRoles = "Jetstream::role('member', 'Member', [
+	// Replace old editor role with member + guest roles
+	$oldRolesPattern = "/Jetstream::role\('editor'.*?\)->description\('.*?'\);/s";
+
+	$newRoles = "Jetstream::role('member', 'Member', [
             'read',
             'create',
             'update',
