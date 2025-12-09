@@ -72,9 +72,18 @@ class EditUser extends EditRecord
 		}
 
 		// Sync user's role in their current team
-		$user->currentTeam?->users()->syncWithoutDetaching([
-			$user->id => ['role' => $this->cachedRole ?? $defaultRole],
-		]);
+		if ($user->currentTeam)
+		{
+			// First ensure user is in the team
+			$user->currentTeam->users()->syncWithoutDetaching([
+				$user->id => ['role' => $this->cachedRole ?? $defaultRole],
+			]);
+
+			// Then update the role (in case user was already in team)
+			$user->currentTeam->users()->updateExistingPivot($user->id, [
+				'role' => $this->cachedRole ?? $defaultRole
+			]);
+		}
 	}
 
 	protected function getHeaderActions(): array

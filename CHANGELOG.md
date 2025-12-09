@@ -2,6 +2,12 @@
 
 All notable changes to `cms-core` will be documented in this file.
 
+## v1.2.7 - 2024-12-09
+
+### Fixed
+- EditUser now correctly updates user role using both syncWithoutDetaching and updateExistingPivot
+- Role changes now properly persist when editing existing users
+
 ## v1.2.6 - 2024-12-09
 
 ### Added
