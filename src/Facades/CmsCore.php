@@ -15,3 +15,4 @@ class CmsCore extends Facade
 	}
 }
 
+

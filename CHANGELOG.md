@@ -2,6 +2,11 @@
 
 All notable changes to `cms-core` will be documented in this file.
 
+## v1.2.6 - 2024-12-09
+
+### Fixed
+- Translation files now publish to correct path (lang/es.json instead of lang/vendor/cms-core/es.json)
+
 ## v1.2.5 - 2024-12-08
 
 ### Fixed
