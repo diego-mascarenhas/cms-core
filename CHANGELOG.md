@@ -2,6 +2,13 @@
 
 All notable changes to `cms-core` will be documented in this file.
 
+## v1.2.10 - 2024-12-09
+
+### Fixed
+- Improved updateJetstreamRoles to handle both 'viewer' and 'editor' roles
+- Now replaces 'viewer' → 'guest' automatically
+- Better detection and messaging for role updates
+
 ## v1.2.9 - 2024-12-09
 
 ### Added

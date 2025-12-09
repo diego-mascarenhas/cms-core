@@ -379,10 +379,30 @@ class InstallCommand extends Command
 		return;
 	}
 
-	// Replace old editor role with member + guest roles
-	$oldRolesPattern = "/Jetstream::role\('editor'.*?\)->description\('.*?'\);/s";
+	// Replace viewer role with guest role
+	if (str_contains($content, "Jetstream::role('viewer'"))
+	{
+		$content = preg_replace(
+			"/Jetstream::role\('viewer', 'Viewer'/",
+			"Jetstream::role('guest', 'Guest'",
+			$content
+		);
+		$content = str_replace(
+			"Viewer users can only read content.",
+			"Guest users can only read content.",
+			$content
+		);
+		file_put_contents($providerPath, $content);
+		$this->info('✓ Jetstream roles updated (viewer → guest)');
+		return;
+	}
 
-	$newRoles = "Jetstream::role('member', 'Member', [
+	// Try to replace old editor role pattern
+	$oldEditorPattern = "/Jetstream::role\('editor'.*?\)->description\('.*?'\);/s";
+
+	if (preg_match($oldEditorPattern, $content))
+	{
+		$newRoles = "Jetstream::role('member', 'Member', [
             'read',
             'create',
             'update',
@@ -392,16 +412,14 @@ class InstallCommand extends Command
             'read',
         ])->description('Guest users can only read content.');";
 
-		if (preg_match($oldRolesPattern, $content))
-		{
-			$content = preg_replace($oldRolesPattern, $newRoles, $content);
-			file_put_contents($providerPath, $content);
-			$this->info('✓ Jetstream roles updated (editor → member + guest)');
-		}
-		else
-		{
-			$this->warn('  Could not find editor role pattern, please update manually');
-		}
+		$content = preg_replace($oldEditorPattern, $newRoles, $content);
+		file_put_contents($providerPath, $content);
+		$this->info('✓ Jetstream roles updated (editor → member + guest)');
+	}
+	else
+	{
+		$this->warn('  Could not find editor/viewer role pattern, roles look good or need manual update');
+	}
 	}
 
 	protected function updateWebRoutes(): void
