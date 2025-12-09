@@ -2,6 +2,16 @@
 
 All notable changes to `cms-core` will be documented in this file.
 
+## v1.2.9 - 2024-12-09
+
+### Added
+- Install command now updates JetstreamServiceProvider roles automatically
+- Replaces old 'editor' role with 'member' and 'guest' roles during installation
+
+### Changed
+- Standard roles are now: admin (Administrator), member (Member), guest (Guest)
+- Removed deprecated 'editor' role in favor of 'member' role
+
 ## v1.2.8 - 2024-12-09
 
 ### Fixed

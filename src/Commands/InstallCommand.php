@@ -48,6 +48,9 @@ class InstallCommand extends Command
 	// Update Team model
 	$this->updateTeamModel();
 
+	// Update Jetstream roles
+	$this->updateJetstreamRoles();
+
 	// Update web routes
 	$this->updateWebRoutes();
 
@@ -354,6 +357,51 @@ class InstallCommand extends Command
 
 		file_put_contents($teamModelPath, $content);
 		$this->info('✓ Team model updated with user_id in fillable');
+	}
+
+	protected function updateJetstreamRoles(): void
+	{
+		$providerPath = app_path('Providers/JetstreamServiceProvider.php');
+
+		if (!file_exists($providerPath))
+		{
+			$this->warn('  JetstreamServiceProvider not found, skipping update');
+			return;
+		}
+
+		$content = file_get_contents($providerPath);
+
+		// Check if already has the correct roles
+		if (str_contains($content, "Jetstream::role('member', 'Member'") && 
+			str_contains($content, "Jetstream::role('guest', 'Guest'"))
+		{
+			$this->info('✓ Jetstream roles already updated');
+			return;
+		}
+
+		// Replace old editor role with member + guest roles
+		$oldRolesPattern = "/Jetstream::role\('editor'.*?\)->description\('.*?'\);/s";
+		
+		$newRoles = "Jetstream::role('member', 'Member', [
+            'read',
+            'create',
+            'update',
+        ])->description('Member users have the ability to read, create, and update.');
+
+        Jetstream::role('guest', 'Guest', [
+            'read',
+        ])->description('Guest users can only read content.');";
+
+		if (preg_match($oldRolesPattern, $content))
+		{
+			$content = preg_replace($oldRolesPattern, $newRoles, $content);
+			file_put_contents($providerPath, $content);
+			$this->info('✓ Jetstream roles updated (editor → member + guest)');
+		}
+		else
+		{
+			$this->warn('  Could not find editor role pattern, please update manually');
+		}
 	}
 
 	protected function updateWebRoutes(): void
