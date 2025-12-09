@@ -45,12 +45,7 @@ class UserResource extends Resource
 			->required()
 			->minLength(3)
 			->maxLength(255)
-			->extraInputAttributes(['required' => false, 'minlength' => false, 'maxlength' => false])
-			->validationMessages([
-				'required' => __('validation.required'),
-				'min' => __('validation.min.string', ['min' => 3]),
-				'max' => __('validation.max.string', ['max' => 255]),
-			]),
+			->extraInputAttributes(['required' => false, 'minlength' => false, 'maxlength' => false]),
 
 		Forms\Components\TextInput::make('password')
 			->label(__('Password'))
@@ -59,12 +54,7 @@ class UserResource extends Resource
 			->required(fn (string $context): bool => $context === 'create')
 			->minLength(8)
 			->maxLength(255)
-			->extraInputAttributes(['required' => false, 'minlength' => false, 'maxlength' => false])
-			->validationMessages([
-				'required' => __('validation.required'),
-				'min' => __('validation.min.string', ['min' => 8]),
-				'max' => __('validation.max.string', ['max' => 255]),
-			]),
+			->extraInputAttributes(['required' => false, 'minlength' => false, 'maxlength' => false]),
 
 		Forms\Components\TextInput::make('email')
 			->label(__('Email'))
@@ -72,13 +62,7 @@ class UserResource extends Resource
 			->required()
 			->unique(ignoreRecord: true)
 			->maxLength(255)
-			->extraInputAttributes(['required' => false, 'maxlength' => false])
-			->validationMessages([
-				'required' => __('validation.required'),
-				'email' => __('validation.email'),
-				'unique' => __('validation.unique'),
-				'max' => __('validation.max.string', ['max' => 255]),
-			]),
+			->extraInputAttributes(['required' => false, 'maxlength' => false]),
 
 		Forms\Components\TextInput::make('phone')
 			->label(__('Phone'))
@@ -86,11 +70,7 @@ class UserResource extends Resource
 			->minLength(10)
 			->maxLength(20)
 			->nullable()
-			->extraInputAttributes(['minlength' => false, 'maxlength' => false])
-			->validationMessages([
-				'min' => __('validation.min.string', ['min' => 10]),
-				'max' => __('validation.max.string', ['max' => 20]),
-			]),
+			->extraInputAttributes(['minlength' => false, 'maxlength' => false]),
 
 		Forms\Components\Select::make('role')
 			->label(__('Role'))
@@ -106,9 +86,6 @@ class UserResource extends Resource
 			->required()
 			->extraAttributes(['required' => false])
 			->helperText(__('Role is assigned to user personal team'))
-			->validationMessages([
-				'required' => __('validation.required'),
-			])
 			->columnSpanFull(),
 
 				Forms\Components\KeyValue::make('data')

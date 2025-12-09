@@ -2,6 +2,13 @@
 
 All notable changes to `cms-core` will be documented in this file.
 
+## v1.2.8 - 2024-12-09
+
+### Fixed
+- Removed custom validationMessages to allow Laravel automatic validation translations
+- Laravel now uses lang/es/validation.php automatically for all validation messages
+- Validation messages now display in correct Spanish format (e.g., "El campo nombre es obligatorio.")
+
 ## v1.2.7 - 2024-12-09
 
 ### Fixed
