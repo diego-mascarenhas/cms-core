@@ -5,8 +5,8 @@ namespace Idoneo\CmsCore\Filament;
 use Filament\Contracts\Plugin;
 use Filament\Navigation\MenuItem;
 use Filament\Panel;
-use Filament\Support\Facades\FilamentView;
 use Idoneo\CmsCore\CmsCore;
+use Illuminate\Support\Facades\File;
 
 class CmsCorePlugin implements Plugin
 {
@@ -21,11 +21,16 @@ class CmsCorePlugin implements Plugin
 			->userMenuItems($this->getUserMenuItems())
 			->resources([
 				\Idoneo\CmsCore\Filament\Resources\UserResource::class,
+				\Idoneo\CmsCore\Filament\Resources\PostResource::class,
 			])
 			->widgets([
 				\Idoneo\CmsCore\Filament\Widgets\UserStatsOverview::class,
 				\Idoneo\CmsCore\Filament\Widgets\UsersChart::class,
+				\Idoneo\CmsCore\Filament\Widgets\PostsChart::class,
 			]);
+
+		// Auto-configure logos if they exist
+		$this->configureBrandLogos($panel);
 	}
 
 	public function boot(Panel $panel): void
@@ -80,5 +85,54 @@ class CmsCorePlugin implements Plugin
 		}
 
 		return $items;
+	}
+
+	/**
+	 * Automatically configure brand logos if logo-*.svg files exist in public/custom/.
+	 */
+	protected function configureBrandLogos(Panel $panel): void
+	{
+		$customPath = public_path('custom');
+
+		if (!File::isDirectory($customPath))
+		{
+			return;
+		}
+
+		$logoFiles = File::glob($customPath . '/logo-*.svg');
+
+		if (empty($logoFiles))
+		{
+			return;
+		}
+
+		// Look for logo-light.svg and logo-dark.svg
+		$logoLight = null;
+		$logoDark = null;
+
+		foreach ($logoFiles as $logoFile)
+		{
+			$filename = basename($logoFile);
+
+			if ($filename === 'logo-light.svg')
+			{
+				$logoLight = 'custom/' . $filename;
+			}
+			elseif ($filename === 'logo-dark.svg')
+			{
+				$logoDark = 'custom/' . $filename;
+			}
+		}
+
+		// Configure logos
+		if ($logoLight)
+		{
+			$panel->brandLogo(asset($logoLight));
+		}
+
+		if ($logoDark)
+		{
+			$panel->darkModeBrandLogo(asset($logoDark));
+		}
 	}
 }

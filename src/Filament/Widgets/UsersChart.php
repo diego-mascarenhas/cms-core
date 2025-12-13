@@ -8,9 +8,19 @@ class UsersChart extends ChartWidget
 {
 	protected static ?int $sort = 2;
 
+	protected int | string | array $columnSpan = [
+		'md' => 1,
+		'xl' => 1,
+	];
+
 	public function getHeading(): ?string
 	{
 		return __('User Growth');
+	}
+
+	protected function getHeight(): ?string
+	{
+		return '250px';
 	}
 
 	protected function getData(): array

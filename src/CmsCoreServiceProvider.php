@@ -2,7 +2,10 @@
 
 namespace Idoneo\CmsCore;
 
+use Idoneo\CmsCore\Commands\CreateAdminCommand;
+use Idoneo\CmsCore\Commands\GenerateApiToken;
 use Idoneo\CmsCore\Commands\InstallCommand;
+use Idoneo\CmsCore\Commands\UpdateCommand;
 use Illuminate\Support\ServiceProvider;
 use Livewire\Livewire;
 
@@ -42,6 +45,9 @@ class CmsCoreServiceProvider extends ServiceProvider
 		{
 			$this->commands([
 				InstallCommand::class,
+				UpdateCommand::class,
+				CreateAdminCommand::class,
+				GenerateApiToken::class,
 			]);
 		}
 	}
@@ -82,6 +88,14 @@ class CmsCoreServiceProvider extends ServiceProvider
 		$this->publishes([
 			__DIR__ . '/../database/seeders/DatabaseSeeder.php' => database_path('seeders/DatabaseSeeder.php'),
 		], 'cms-core-seeders');
+
+		// API Controllers, Requests, Resources, Middleware
+		$this->publishes([
+			__DIR__ . '/../app/Http/Controllers/Api' => app_path('Http/Controllers/Api'),
+			__DIR__ . '/../app/Http/Requests/Api' => app_path('Http/Requests/Api'),
+			__DIR__ . '/../app/Http/Resources' => app_path('Http/Resources'),
+			__DIR__ . '/../app/Http/Middleware/AuthenticateApiToken.php' => app_path('Http/Middleware/AuthenticateApiToken.php'),
+		], 'cms-core-api');
 
 		// All publishables
 		$this->publishes([

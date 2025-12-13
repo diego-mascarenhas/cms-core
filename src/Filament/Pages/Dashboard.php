@@ -34,6 +34,7 @@ class Dashboard extends BaseDashboard
 		return [
 			\Idoneo\CmsCore\Filament\Widgets\UserStatsOverview::class,
 			\Idoneo\CmsCore\Filament\Widgets\UsersChart::class,
+			\Idoneo\CmsCore\Filament\Widgets\PostsChart::class,
 		];
 	}
 }
