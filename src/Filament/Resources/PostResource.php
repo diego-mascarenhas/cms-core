@@ -118,14 +118,17 @@ class PostResource extends Resource
 						SpatieTagsInput::make('tags')
 							->label(__('Tags'))
 							->type('tags')
-							->placeholder(__('Add tags')),
+							->placeholder(__('Add tags'))
+							->nullable()
+							->columnSpanFull(),
 
 						SpatieTagsInput::make('categories')
 							->label(__('Categories'))
 							->type('categories')
-							->placeholder(__('Add categories')),
-					])
-					->columns(2),
+							->placeholder(__('Add categories'))
+							->nullable()
+							->columnSpanFull(),
+					]),
 
 				Section::make(__('Settings'))
 					->schema([
