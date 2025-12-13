@@ -153,7 +153,7 @@ class PostResource extends Resource
 		return $table
 			->columns([
 				SpatieMediaLibraryImageColumn::make('featured')
-					->label(__('Featured'))
+					->label('')
 					->collection('featured')
 					->conversion('thumb')
 					->size(50),
@@ -171,11 +171,13 @@ class PostResource extends Resource
 
 				SpatieTagsColumn::make('tags')
 					->label(__('Tags'))
-					->type('tags'),
+					->type('tags')
+					->toggleable(isToggledHiddenByDefault: true),
 
 				SpatieTagsColumn::make('categories')
 					->label(__('Categories'))
-					->type('categories'),
+					->type('categories')
+					->toggleable(isToggledHiddenByDefault: true),
 
 				Tables\Columns\SelectColumn::make('status')
 					->label(__('Status'))
