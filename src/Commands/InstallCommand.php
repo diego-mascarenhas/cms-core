@@ -99,15 +99,15 @@ class InstallCommand extends Command
 		// Rename tags migration to sequential format
 		$this->renameTagsMigration();
 
-		// Remove duplicate migrations (two_factor, teams, etc.)
-		$this->removeDuplicateMigrations();
+		// Remove duplicate two_factor migrations only (if multiple exist)
+		$this->removeDuplicateTwoFactorMigrations();
 
-		// Publish CMS Core migrations
+		// Publish CMS Core migrations (includes teams migrations)
 		$this->call('vendor:publish', [
 			'--tag' => 'cms-core-migrations',
 			'--force' => true,
 		]);
-		$this->info('✓ CMS Core migrations published');
+		$this->info('✓ CMS Core migrations published (including teams)');
 
 		// Publish views
 		$this->call('vendor:publish', [
@@ -150,20 +150,25 @@ class InstallCommand extends Command
 			$this->newLine();
 			$this->warn('Running fresh migrations...');
 			$this->call('migrate:fresh');
+
+			// Automatically create admin user after fresh migration
+			$this->newLine();
+			$this->info('Creating admin user...');
+			$this->createAdminUser();
 		}
 		else
 		{
 			$this->newLine();
 			$this->info('Running migrations...');
 			$this->call('migrate');
-		}
 
-		// Create admin user
-		if ($this->option('seed'))
-		{
-			$this->newLine();
-			$this->info('Creating admin user...');
-			$this->createAdminUser();
+			// Create admin user only if --seed flag is provided
+			if ($this->option('seed'))
+			{
+				$this->newLine();
+				$this->info('Creating admin user...');
+				$this->createAdminUser();
+			}
 		}
 
 		$this->newLine();
@@ -173,14 +178,30 @@ class InstallCommand extends Command
 		$this->comment('Next steps:');
 		$this->line('  1. Run: npm install && npm run build');
 		$this->line('  2. Add APP_TEAMS=true to .env if you need multi-tenant mode (default: false)');
-		$this->line('  3. Access admin panel at: /admin');
+		$this->line('  3. Run: php artisan config:clear (to clear config cache)');
+		$this->line('  4. Access admin panel at: /admin');
 
-		if ($this->option('seed'))
+		if ($this->option('fresh') || $this->option('seed'))
 		{
 			$this->newLine();
 			$this->comment('Admin credentials:');
 			$this->line('  - Email: hola@humano.app');
 			$this->line('  - Password: Simplicity!');
+		}
+
+		$this->newLine();
+		$this->comment('Teams feature:');
+		$teamsEnabled = config('cms-core.teams_enabled', false);
+		if ($teamsEnabled)
+		{
+			$this->line('  ✓ Teams feature is ENABLED (APP_TEAMS=true)');
+			$this->line('  - Profile, Team Settings, and Create Team will appear in user menu');
+		}
+		else
+		{
+			$this->line('  ✗ Teams feature is DISABLED (APP_TEAMS not set or false)');
+			$this->line('  - Only Logout will appear in user menu');
+			$this->line('  - To enable: Add APP_TEAMS=true to .env and run: php artisan config:clear');
 		}
 
 		return self::SUCCESS;
@@ -195,6 +216,14 @@ class InstallCommand extends Command
 		if ($userModel::where('email', 'hola@humano.app')->exists())
 		{
 			$this->warn('  Admin user already exists, skipping...');
+			return;
+		}
+
+		// Verify teams table exists before creating team
+		if (!Schema::hasTable('teams'))
+		{
+			$this->error('  Teams table does not exist. Please run migrations first.');
+			$this->warn('  Run: php artisan migrate');
 			return;
 		}
 
@@ -473,12 +502,51 @@ class InstallCommand extends Command
 
 		$content = file_get_contents($routesPath);
 
+		// Check if Jetstream routes are already registered
+		if (!str_contains($content, 'Jetstream::routes()'))
+		{
+			// Add Jetstream routes after the opening PHP tag
+			if (preg_match('/<\?php\s*\n/', $content))
+			{
+				$content = preg_replace(
+					'/<\?php\s*\n/',
+					"<?php\n\nuse Laravel\\Jetstream\\Jetstream;\n",
+					$content,
+					1
+				);
+			}
+
+			// Add Jetstream::routes() before the root route
+			if (!str_contains($content, 'Jetstream::routes()'))
+			{
+				$jetstreamRoutes = "\n// Jetstream routes (profile, teams, etc.)\nJetstream::routes();\n\n";
+
+				// Find the position to insert (before Route::get('/'))
+				if (preg_match("/Route::get\(['\"]\/['\"]/", $content, $matches, PREG_OFFSET_CAPTURE))
+				{
+					$position = $matches[0][1];
+					$content = substr_replace($content, $jetstreamRoutes, $position, 0);
+				}
+				else
+				{
+					// If no root route found, append at the end
+					$content .= "\n" . $jetstreamRoutes;
+				}
+			}
+
+			file_put_contents($routesPath, $content);
+			$this->info('✓ Jetstream routes registered');
+		}
+
 		// Check if already redirects to admin
 		if (str_contains($content, "redirect('/admin')"))
 		{
 			$this->info('✓ Root route already redirects to /admin');
 			return;
 		}
+
+		// Reload content after potential Jetstream routes addition
+		$content = file_get_contents($routesPath);
 
 		// Replace default route
 		$content = preg_replace(
@@ -697,9 +765,10 @@ class InstallCommand extends Command
 	}
 
 	/**
-	 * Remove duplicate migrations (two_factor, teams, etc.).
+	 * Remove duplicate two_factor migrations by analyzing content.
+	 * Only removes if multiple migrations try to add the same columns.
 	 */
-	protected function removeDuplicateMigrations(): void
+	protected function removeDuplicateTwoFactorMigrations(): void
 	{
 		$migrationsPath = database_path('migrations');
 
@@ -708,46 +777,42 @@ class InstallCommand extends Command
 			return;
 		}
 
-		// Patterns to detect duplicate migrations
-		$patterns = [
-			'two_factor' => ['two_factor', 'two-factor'],
-			'teams' => ['create_teams_table', 'teams_table'],
-			'team_user' => ['create_team_user_table', 'team_user_table'],
-			'team_invitations' => ['create_team_invitations_table', 'team_invitations_table'],
-		];
+		// Find all two_factor migrations and check their content
+		$twoFactorMigrations = collect(File::files($migrationsPath))
+			->filter(function ($file) {
+				$filename = $file->getFilename();
+				return str_contains($filename, 'two_factor') ||
+				       str_contains($filename, 'two-factor');
+			})
+			->map(function ($file) {
+				$content = File::get($file->getPathname());
+				return [
+					'file' => $file,
+					'content' => $content,
+					'addsTwoFactorSecret' => str_contains($content, 'two_factor_secret') ||
+					                          str_contains($content, "->string('two_factor_secret')") ||
+					                          str_contains($content, "->text('two_factor_secret')"),
+				];
+			})
+			->filter(function ($migration) {
+				return $migration['addsTwoFactorSecret'];
+			})
+			->sortBy(function ($migration) {
+				return $migration['file']->getFilename();
+			})
+			->values();
 
-		foreach ($patterns as $type => $searchTerms)
+		// If there are multiple migrations that add two_factor_secret, keep only the first one
+		if ($twoFactorMigrations->count() > 1)
 		{
-			// Find all migrations matching this pattern
-			$migrations = collect(File::files($migrationsPath))
-				->filter(function ($file) use ($searchTerms) {
-					$filename = $file->getFilename();
-					foreach ($searchTerms as $term)
-					{
-						if (str_contains($filename, $term))
-						{
-							return true;
-						}
-					}
-					return false;
-				})
-				->sortBy(function ($file) {
-					return $file->getFilename();
-				})
-				->values();
+			$firstMigration = $twoFactorMigrations->first();
 
-			// If there are duplicates, keep only the first one
-			if ($migrations->count() > 1)
+			foreach ($twoFactorMigrations as $migration)
 			{
-				$firstMigration = $migrations->first();
-
-				foreach ($migrations as $migration)
+				if ($migration['file']->getPathname() !== $firstMigration['file']->getPathname())
 				{
-					if ($migration->getPathname() !== $firstMigration->getPathname())
-					{
-						File::delete($migration->getPathname());
-						$this->info("✓ Removed duplicate {$type} migration: {$migration->getFilename()}");
-					}
+					File::delete($migration['file']->getPathname());
+					$this->info("✓ Removed duplicate two_factor migration: {$migration['file']->getFilename()}");
 				}
 			}
 		}

@@ -61,28 +61,47 @@ class CmsCorePlugin implements Plugin
 		// Team-related items (only if teams are enabled)
 		if (CmsCore::teamsEnabled())
 		{
-			// Profile
-			$items['profile'] = MenuItem::make()
-				->label(__('Profile'))
-				->url(fn (): string => route('profile.show'))
-				->icon('heroicon-o-user');
+			// Profile (only if route exists)
+			if (\Illuminate\Support\Facades\Route::has('profile.show'))
+			{
+				$items['cms-profile'] = MenuItem::make()
+					->label(__('Mi Perfil'))
+					->url(fn (): string => route('profile.show'))
+					->icon('heroicon-o-user')
+					->sort(10);
+			}
 
-			// Team Settings
-			$items['team-settings'] = MenuItem::make()
-				->label(__('Team Settings'))
-				->url(fn (): string => auth()->check() && auth()->user()->currentTeam
-					? route('teams.show', auth()->user()->currentTeam)
-					: '#'
-				)
-				->icon('heroicon-o-cog-6-tooth')
-				->visible(fn (): bool => auth()->check() && auth()->user()->currentTeam !== null);
+			// Team Settings (only if route exists)
+			if (\Illuminate\Support\Facades\Route::has('teams.show'))
+			{
+				$items['cms-team-settings'] = MenuItem::make()
+					->label(__('Ajustes del Equipo'))
+					->url(fn (): string => auth()->check() && auth()->user()->currentTeam
+						? route('teams.show', auth()->user()->currentTeam)
+						: '#'
+					)
+					->icon('heroicon-o-cog-6-tooth')
+					->visible(fn (): bool => auth()->check() && auth()->user()->currentTeam !== null)
+					->sort(20);
+			}
 
-			// Create New Team
-			$items['create-team'] = MenuItem::make()
-				->label(__('Create New Team'))
-				->url(fn (): string => route('teams.create'))
-				->icon('heroicon-o-plus-circle');
+			// Create New Team (only if route exists)
+			if (\Illuminate\Support\Facades\Route::has('teams.create'))
+			{
+				$items['cms-create-team'] = MenuItem::make()
+					->label(__('Crear Nuevo Equipo'))
+					->url(fn (): string => route('teams.create'))
+					->icon('heroicon-o-plus-circle')
+					->sort(30);
+			}
 		}
+
+		// Logout button with arrow pointing out
+		$items['logout'] = MenuItem::make()
+			->label(__('Salir'))
+			->url(fn (): string => \Filament\Facades\Filament::getLogoutUrl())
+			->icon('heroicon-o-arrow-right-start-on-rectangle')
+			->sort(999);
 
 		return $items;
 	}

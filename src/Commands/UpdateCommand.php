@@ -72,6 +72,9 @@ class UpdateCommand extends Command
 		// Remove duplicate migrations (two_factor, teams, etc.)
 		$this->removeDuplicateMigrations();
 
+		// Remove migrations that try to add columns/tables that already exist
+		$this->removeRedundantMigrations();
+
 		// Publish CMS Core migrations
 		$this->call('vendor:publish', [
 			'--tag' => 'cms-core-migrations',
@@ -294,6 +297,109 @@ class UpdateCommand extends Command
 						$this->info("✓ Removed duplicate {$type} migration: {$migration->getFilename()}");
 					}
 				}
+			}
+		}
+	}
+
+	/**
+	 * Remove migrations that try to add columns/tables that already exist.
+	 * Also removes migrations that add the same columns/tables as other migrations.
+	 */
+	protected function removeRedundantMigrations(): void
+	{
+		$migrationsPath = database_path('migrations');
+
+		if (!File::isDirectory($migrationsPath))
+		{
+			return;
+		}
+
+		// Find all two_factor migrations and check their content
+		$twoFactorMigrations = collect(File::files($migrationsPath))
+			->filter(function ($file) {
+				$filename = $file->getFilename();
+				return str_contains($filename, 'two_factor') ||
+				       str_contains($filename, 'two-factor');
+			})
+			->map(function ($file) {
+				$content = File::get($file->getPathname());
+				return [
+					'file' => $file,
+					'content' => $content,
+					'addsTwoFactorSecret' => str_contains($content, 'two_factor_secret') || str_contains($content, "->string('two_factor_secret')") || str_contains($content, "->text('two_factor_secret')"),
+				];
+			})
+			->filter(function ($migration) {
+				return $migration['addsTwoFactorSecret'];
+			})
+			->sortBy(function ($migration) {
+				return $migration['file']->getFilename();
+			})
+			->values();
+
+		// If there are multiple migrations that add two_factor_secret, keep only the first one
+		if ($twoFactorMigrations->count() > 1)
+		{
+			$firstMigration = $twoFactorMigrations->first();
+
+			foreach ($twoFactorMigrations as $migration)
+			{
+				if ($migration['file']->getPathname() !== $firstMigration['file']->getPathname())
+				{
+					File::delete($migration['file']->getPathname());
+					$this->info("✓ Removed redundant two_factor migration (duplicate columns): {$migration['file']->getFilename()}");
+				}
+			}
+		}
+
+		// Check for teams table migrations if table already exists
+		if (Schema::hasTable('teams'))
+		{
+			$teamsMigrations = collect(File::files($migrationsPath))
+				->filter(function ($file) {
+					$filename = $file->getFilename();
+					return str_contains($filename, 'create_teams_table') ||
+					       str_contains($filename, 'teams_table');
+				});
+
+			foreach ($teamsMigrations as $migration)
+			{
+				File::delete($migration->getPathname());
+				$this->info("✓ Removed redundant teams migration (table already exists): {$migration->getFilename()}");
+			}
+		}
+
+		// Check for team_user table migrations if table already exists
+		if (Schema::hasTable('team_user'))
+		{
+			$teamUserMigrations = collect(File::files($migrationsPath))
+				->filter(function ($file) {
+					$filename = $file->getFilename();
+					return str_contains($filename, 'create_team_user_table') ||
+					       str_contains($filename, 'team_user_table');
+				});
+
+			foreach ($teamUserMigrations as $migration)
+			{
+				File::delete($migration->getPathname());
+				$this->info("✓ Removed redundant team_user migration (table already exists): {$migration->getFilename()}");
+			}
+		}
+
+		// Check for team_invitations table migrations if table already exists
+		if (Schema::hasTable('team_invitations'))
+		{
+			$teamInvitationsMigrations = collect(File::files($migrationsPath))
+				->filter(function ($file) {
+					$filename = $file->getFilename();
+					return str_contains($filename, 'create_team_invitations_table') ||
+					       str_contains($filename, 'team_invitations_table');
+				});
+
+			foreach ($teamInvitationsMigrations as $migration)
+			{
+				File::delete($migration->getPathname());
+				$this->info("✓ Removed redundant team_invitations migration (table already exists): {$migration->getFilename()}");
 			}
 		}
 	}

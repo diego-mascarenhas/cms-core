@@ -33,9 +33,11 @@ This will:
 - Install CMS-Core package (with Jetstream, Filament, Livewire, and Spatie packages)
 - Configure Jetstream with Livewire + Teams
 - Install Filament panel (with Spanish locale)
+- Register Jetstream routes automatically (`profile.show`, `teams.show`, `teams.create`, etc.)
 - Publish Spatie Permission migrations
 - Publish Spatie Tags migrations
 - Publish Spatie Media Library migrations
+- Publish Teams migrations (included in CMS-Core)
 - Publish Post model
 - Publish CMS-Core config files
 - Configure authentication to use Filament login
@@ -355,6 +357,42 @@ Generate a token in your user profile settings at `/user/api-tokens` or via Jets
 **Headers:**
 ```
 Authorization: Bearer {your-token}
+Content-Type: application/json
+Accept: application/json
+```
+
+## Troubleshooting
+
+### Teams Feature Not Showing
+
+If you have `APP_TEAMS=true` in your `.env` but the teams options don't appear in the user menu, run the diagnostic command:
+
+```bash
+php artisan cms-core:diagnose
+```
+
+This will check:
+- ✓ Config file exists
+- ✓ Teams configuration (ENV, config, CmsCore helper)
+- ✓ Jetstream routes registration
+- ✓ Current user and team setup
+
+**Common solutions:**
+```bash
+# 1. Clear config cache
+php artisan config:clear
+
+# 2. Verify .env has APP_TEAMS=true (no spaces)
+echo "APP_TEAMS=true" >> .env
+
+# 3. Republish config
+php artisan vendor:publish --tag=cms-core-config --force
+
+# 4. Clear cache again
+php artisan config:clear
+
+# 5. Restart server (if using php artisan serve)
+```
 Accept: application/json
 ```
 

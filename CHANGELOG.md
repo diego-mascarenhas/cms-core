@@ -2,15 +2,53 @@
 
 All notable changes to `cms-core` will be documented in this file.
 
+## v1.3.7 - 2024-12-13
+
+### Added
+- **New `cms-core:diagnose` command** - Troubleshoot configuration and setup issues
+- Diagnose command checks: config file, teams configuration, Jetstream routes, and current user
+- Helps identify why teams feature may not be working even when `APP_TEAMS=true`
+
+### Fixed
+- **Teams migrations now included in CMS-Core package** - Resolved persistent "Teams table does not exist" errors on fresh installations
+- Teams migrations (`create_teams_table`, `create_team_user_table`, `create_team_invitations_table`) are now part of cms-core migrations, not Jetstream
+- Removed reliance on `jetstream-migrations` tag which doesn't properly publish teams tables in Laravel 11
+- Simplified installation flow by removing all teams migration verification and force-publish logic
+- Fresh installations now correctly create all necessary tables including teams
+- **Fixed Jetstream routes registration** - Resolved "Route [teams.show] not defined" error
+- Install command now automatically registers `Jetstream::routes()` in `web.php`
+- User menu items now check if routes exist before trying to use them, preventing errors
+- **Fixed Jetstream teams feature not enabled** - Install command now enables `Features::teams()` in Jetstream config
+- Install command changes Jetstream stack to `livewire` automatically
+- User menu items use unique keys to avoid conflicts with Filament's default menu items
+
+### Changed
+- Removed all Jetstream migration publishing logic from `InstallCommand` and `UpdateCommand`
+- All teams-related migrations are now published via `cms-core-migrations` tag
+- Teams migrations now use sequential numbering (2024_12_08_000003 through 000005)
+- User menu items are conditionally displayed based on route availability
+- Installation command now shows teams feature status and provides clearer instructions
+- **Logout button now uses arrow pointing outward** (`heroicon-o-arrow-right-start-on-rectangle`)
+- User menu items sorted: Profile (10), Team Settings (20), Create Team (30), Logout (999)
+
 ## v1.3.6 - 2024-12-13
 
 ### Fixed
+- **Fixed duplicate two_factor migrations by content analysis** - New method `removeRedundantMigrations()` now analyzes migration content, not just filenames
+- Detects migrations that add `two_factor_secret` column by reading file content, preventing "Duplicate column name" errors
 - **Fixed duplicate teams migrations** - Generic method `removeDuplicateMigrations()` now handles duplicate migrations for:
   - `create_teams_table` (prevents "Table already exists" errors)
   - `create_team_user_table` (prevents "Table already exists" errors)
   - `create_team_invitations_table` (prevents "Table already exists" errors)
 - Replaced specific `removeDuplicateTwoFactorMigrations()` with generic `removeDuplicateMigrations()` method
 - Method now handles multiple migration types in a single pass for better performance
+- `removeRedundantMigrations()` checks migration content to detect duplicate column/table additions, even with different filenames
+- **Fixed `--fresh` flag not creating teams table** - `removeRedundantMigrations()` is now skipped when using `--fresh` flag to prevent removing necessary migrations
+- `removeRedundantMigrations()` now only removes duplicate migrations, not all migrations if table exists
+
+### Changed
+- **`--fresh` flag now automatically creates admin user** - When using `cms-core:install --fresh`, the admin user is automatically created (no need for `--seed` flag)
+- This makes fresh installations more intuitive and ready to use immediately
 
 ## v1.3.5 - 2024-12-13
 

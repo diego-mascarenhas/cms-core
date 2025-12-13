@@ -63,14 +63,16 @@ class PostResource extends Resource
 								{
 									$set('slug', Str::slug($state));
 								}
-							}),
+							})
+							->columnSpanFull(),
 
 						Forms\Components\TextInput::make('slug')
 							->label(__('Slug'))
 							->required()
 							->unique(ignoreRecord: true)
 							->maxLength(255)
-							->alphaDash(),
+							->alphaDash()
+							->columnSpanFull(),
 
 						Forms\Components\Textarea::make('excerpt')
 							->label(__('Excerpt'))
@@ -89,8 +91,7 @@ class PostResource extends Resource
 								'orderedList',
 							])
 							->columnSpanFull(),
-					])
-					->columns(2),
+					]),
 
 				Section::make(__('Media'))
 					->schema([
