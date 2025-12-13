@@ -2,11 +2,25 @@
 
 All notable changes to `cms-core` will be documented in this file.
 
+## v1.3.5 - 2024-12-13
+
+### Fixed
+- **Fixed Media Library migrations tag** - Changed from `migrations` to `medialibrary-migrations` to correctly publish media table
+- **Improved tags migration handling** - Automatically removes duplicate tags migrations if table already exists
+- `renameTagsMigration()` now checks if `tags` table exists and removes duplicate migrations instead of creating new ones
+- **Fixed duplicate two_factor migrations** - Automatically removes duplicate `two_factor_columns_to_users_table` migrations
+- New method `removeDuplicateTwoFactorMigrations()` prevents "Duplicate column name" errors during fresh installations
+- Simplified migration duplicate detection (no longer queries migrations table, just checks if table exists)
+- Use `--force` flag with `cms-core:update` to force overwrite existing files (e.g., `php artisan cms-core:update --force`)
+
 ## v1.3.4 - 2024-12-13
 
 ### Fixed
+- **Fixed Media Library migrations tag** - Changed from `migrations` to `medialibrary-migrations` to correctly publish media table
 - **Improved tags migration handling** - Automatically removes duplicate tags migrations if table already exists
 - `renameTagsMigration()` now checks if `tags` table exists and removes duplicate migrations instead of creating new ones
+- **Fixed duplicate two_factor migrations** - Automatically removes duplicate `two_factor_columns_to_users_table` migrations
+- New method `removeDuplicateTwoFactorMigrations()` prevents "Duplicate column name" errors
 - Simplified migration duplicate detection (no longer queries migrations table, just checks if table exists)
 - Use `--force` flag with `cms-core:update` to force overwrite existing files (e.g., `php artisan cms-core:update --force`)
 

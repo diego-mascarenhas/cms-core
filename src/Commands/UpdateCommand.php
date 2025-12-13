@@ -62,12 +62,15 @@ class UpdateCommand extends Command
 		// Publish Spatie Media Library migrations
 		$this->call('vendor:publish', [
 			'--provider' => 'Spatie\MediaLibrary\MediaLibraryServiceProvider',
-			'--tag' => 'migrations',
+			'--tag' => 'medialibrary-migrations',
 		]);
 		$this->info('✓ Media Library migrations checked');
 
 		// Rename tags migration to sequential format
 		$this->renameTagsMigration();
+
+		// Remove duplicate two_factor migrations
+		$this->removeDuplicateTwoFactorMigrations();
 
 		// Publish CMS Core migrations
 		$this->call('vendor:publish', [
@@ -235,6 +238,45 @@ class UpdateCommand extends Command
 		{
 			File::move($oldPath, $newPath);
 			$this->info("✓ Tags migration renamed to: {$newFilename}");
+		}
+	}
+
+	/**
+	 * Remove duplicate two_factor migrations.
+	 */
+	protected function removeDuplicateTwoFactorMigrations(): void
+	{
+		$migrationsPath = database_path('migrations');
+
+		if (!File::isDirectory($migrationsPath))
+		{
+			return;
+		}
+
+		// Find all two_factor migrations
+		$twoFactorMigrations = collect(File::files($migrationsPath))
+			->filter(function ($file) {
+				return str_contains($file->getFilename(), 'two_factor') ||
+				       str_contains($file->getFilename(), 'two-factor');
+			})
+			->sortBy(function ($file) {
+				return $file->getFilename();
+			})
+			->values();
+
+		// If there are duplicates, keep only the first one
+		if ($twoFactorMigrations->count() > 1)
+		{
+			$firstMigration = $twoFactorMigrations->first();
+
+			foreach ($twoFactorMigrations as $migration)
+			{
+				if ($migration->getPathname() !== $firstMigration->getPathname())
+				{
+					File::delete($migration->getPathname());
+					$this->info("✓ Removed duplicate two_factor migration: {$migration->getFilename()}");
+				}
+			}
 		}
 	}
 }
