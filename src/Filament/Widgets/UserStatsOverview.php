@@ -30,6 +30,15 @@ class UserStatsOverview extends BaseWidget
 			->descriptionIcon('heroicon-m-check-badge')
 			->color('success');
 
+		// New Users This Month
+		$newUsersThisMonth = $userModel::whereMonth('created_at', now()->month)
+			->whereYear('created_at', now()->year)
+			->count();
+		$stats[] = Stat::make(__('New This Month'), $newUsersThisMonth)
+			->description(__('Users registered this month'))
+			->descriptionIcon('heroicon-m-arrow-trending-up')
+			->color('info');
+
 		// Users by Role (if Jetstream roles are configured)
 		if (!empty(Jetstream::$roles))
 		{
@@ -42,15 +51,6 @@ class UserStatsOverview extends BaseWidget
 					->color($this->getRoleColor($role->key));
 			}
 		}
-
-		// New Users This Month
-		$newUsersThisMonth = $userModel::whereMonth('created_at', now()->month)
-			->whereYear('created_at', now()->year)
-			->count();
-		$stats[] = Stat::make(__('New This Month'), $newUsersThisMonth)
-			->description(__('Users registered this month'))
-			->descriptionIcon('heroicon-m-arrow-trending-up')
-			->color('info');
 
 		return $stats;
 	}
