@@ -14,6 +14,7 @@ use Filament\Support\Colors\Color;
 use Idoneo\CmsCore\Filament\CmsCorePlugin;
 use Idoneo\CmsCore\Filament\Pages\Dashboard;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
+use Illuminate\Support\Facades\File;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
@@ -24,7 +25,7 @@ class AdminPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
     {
-        return $panel
+        $panel = $panel
             ->default()
             ->id('admin')
             ->path('admin')
@@ -59,6 +60,11 @@ class AdminPanelProvider extends PanelProvider
                 Authenticate::class,
             ])
             ->userMenuItems($this->getUserMenuItems());
+
+        // Auto-configure logos if they exist
+        $this->configureBrandLogos($panel);
+
+        return $panel;
     }
 
     /**
@@ -110,5 +116,28 @@ class AdminPanelProvider extends PanelProvider
             ->postAction(fn (): string => Filament::getLogoutUrl());
 
         return $items;
+    }
+
+    /**
+     * Automatically configure brand logos if logo-light.svg or logo-dark.svg exist.
+     */
+    protected function configureBrandLogos(Panel $panel): void
+    {
+        $publicPath = public_path();
+        $logoLightPath = $publicPath . '/logo-light.svg';
+        $logoDarkPath = $publicPath . '/logo-dark.svg';
+
+        $hasLogoLight = File::exists($logoLightPath);
+        $hasLogoDark = File::exists($logoDarkPath);
+
+        if ($hasLogoLight)
+        {
+            $panel->brandLogo(asset('logo-light.svg'));
+        }
+
+        if ($hasLogoDark)
+        {
+            $panel->darkModeBrandLogo(asset('logo-dark.svg'));
+        }
     }
 }

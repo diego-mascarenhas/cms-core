@@ -7,6 +7,7 @@ use Filament\Navigation\MenuItem;
 use Filament\Panel;
 use Filament\Support\Facades\FilamentView;
 use Idoneo\CmsCore\CmsCore;
+use Illuminate\Support\Facades\File;
 
 class CmsCorePlugin implements Plugin
 {
@@ -26,6 +27,9 @@ class CmsCorePlugin implements Plugin
 				\Idoneo\CmsCore\Filament\Widgets\UserStatsOverview::class,
 				\Idoneo\CmsCore\Filament\Widgets\UsersChart::class,
 			]);
+
+		// Auto-configure logos if they exist
+		$this->configureBrandLogos($panel);
 	}
 
 	public function boot(Panel $panel): void
@@ -80,5 +84,61 @@ class CmsCorePlugin implements Plugin
 		}
 
 		return $items;
+	}
+
+	/**
+	 * Automatically configure brand logos if logo-*.svg files exist in public directory.
+	 */
+	protected function configureBrandLogos(Panel $panel): void
+	{
+		$publicPath = public_path();
+
+		// Find all logo-*.svg files
+		$logoFiles = File::glob($publicPath . '/logo-*.svg');
+
+		if (empty($logoFiles))
+		{
+			return;
+		}
+
+		// Extract just the filenames
+		$logoFilenames = array_map(function ($path) use ($publicPath) {
+			return str_replace($publicPath . '/', '', $path);
+		}, $logoFiles);
+
+		// Look for specific patterns
+		$logoLight = null;
+		$logoDark = null;
+
+		foreach ($logoFilenames as $filename)
+		{
+			// Check for light mode variants
+			if (preg_match('/logo-(light|white|claro)\.svg$/i', $filename))
+			{
+				$logoLight = $filename;
+			}
+			// Check for dark mode variants
+			elseif (preg_match('/logo-(dark|black|oscuro)\.svg$/i', $filename))
+			{
+				$logoDark = $filename;
+			}
+		}
+
+		// If no specific light/dark found, use the first logo as default
+		if (!$logoLight && !$logoDark && !empty($logoFilenames))
+		{
+			$logoLight = $logoFilenames[0];
+		}
+
+		// Configure logos
+		if ($logoLight)
+		{
+			$panel->brandLogo(asset($logoLight));
+		}
+
+		if ($logoDark)
+		{
+			$panel->darkModeBrandLogo(asset($logoDark));
+		}
 	}
 }
