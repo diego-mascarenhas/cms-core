@@ -319,7 +319,7 @@ class UpdateCommand extends Command
 		if (Schema::hasTable('teams'))
 		{
 			$this->info('Teams table already exists, removing duplicate migrations...');
-			
+
 			$teamsMigrations = collect(File::files($migrationsPath))
 				->filter(function ($file) {
 					$filename = $file->getFilename();
