@@ -5,6 +5,7 @@ namespace Idoneo\CmsCore\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Schema;
 
 class InstallCommand extends Command
 {
@@ -595,7 +596,7 @@ class InstallCommand extends Command
 	}
 
 	/**
-	 * Rename tags migration to sequential format.
+	 * Rename tags migration to sequential format or remove if table already exists.
 	 */
 	protected function renameTagsMigration(): void
 	{
@@ -604,6 +605,36 @@ class InstallCommand extends Command
 		if (!File::isDirectory($migrationsPath))
 		{
 			return;
+		}
+
+		// Check if tags table already exists in database
+		try
+		{
+			if (Schema::hasTable('tags'))
+			{
+				// Find all tags migration files (there might be duplicates)
+				$tagsMigrations = collect(File::files($migrationsPath))
+					->filter(function ($file) {
+						return str_contains($file->getFilename(), 'create_tag_tables');
+					});
+
+				// If table exists, keep only the first migration and remove duplicates
+				$firstMigration = $tagsMigrations->first();
+				foreach ($tagsMigrations as $migration)
+				{
+					if ($migration->getPathname() !== $firstMigration->getPathname())
+					{
+						File::delete($migration->getPathname());
+						$this->info("✓ Removed duplicate tags migration: {$migration->getFilename()}");
+					}
+				}
+
+				return;
+			}
+		}
+		catch (\Exception $e)
+		{
+			// Database might not be accessible, continue with rename logic
 		}
 
 		// Find the tags migration file

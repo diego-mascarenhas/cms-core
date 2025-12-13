@@ -2,6 +2,14 @@
 
 All notable changes to `cms-core` will be documented in this file.
 
+## v1.3.4 - 2024-12-13
+
+### Fixed
+- **Improved tags migration handling** - Automatically removes duplicate tags migrations if table already exists
+- `renameTagsMigration()` now checks if `tags` table exists and removes duplicate migrations instead of creating new ones
+- Simplified migration duplicate detection (no longer queries migrations table, just checks if table exists)
+- Use `--force` flag with `cms-core:update` to force overwrite existing files (e.g., `php artisan cms-core:update --force`)
+
 ## v1.3.2 - 2024-12-13
 
 ### Fixed
