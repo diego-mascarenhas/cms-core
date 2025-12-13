@@ -58,6 +58,13 @@ class UpdateCommand extends Command
 		]);
 		$this->info('✓ Tags migrations checked');
 
+		// Publish Spatie Media Library migrations
+		$this->call('vendor:publish', [
+			'--provider' => 'Spatie\MediaLibrary\MediaLibraryServiceProvider',
+			'--tag' => 'migrations',
+		]);
+		$this->info('✓ Media Library migrations checked');
+
 		// Rename tags migration to sequential format
 		$this->renameTagsMigration();
 

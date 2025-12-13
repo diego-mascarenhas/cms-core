@@ -88,6 +88,13 @@ class InstallCommand extends Command
 		]);
 		$this->info('✓ Tags migrations published');
 
+		// Publish Spatie Media Library migrations
+		$this->call('vendor:publish', [
+			'--provider' => 'Spatie\MediaLibrary\MediaLibraryServiceProvider',
+			'--tag' => 'migrations',
+		]);
+		$this->info('✓ Media Library migrations published');
+
 		// Rename tags migration to sequential format
 		$this->renameTagsMigration();
 

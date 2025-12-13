@@ -30,10 +30,13 @@ npm install && npm run build
 
 This will:
 - Create a new Laravel project
-- Install CMS-Core package (with Jetstream, Filament, Livewire, and Spatie Permission)
+- Install CMS-Core package (with Jetstream, Filament, Livewire, and Spatie packages)
 - Configure Jetstream with Livewire + Teams
 - Install Filament panel (with Spanish locale)
 - Publish Spatie Permission migrations
+- Publish Spatie Tags migrations
+- Publish Spatie Media Library migrations
+- Publish Post model
 - Publish CMS-Core config files
 - Configure authentication to use Filament login
 - Set application locale to Spanish
