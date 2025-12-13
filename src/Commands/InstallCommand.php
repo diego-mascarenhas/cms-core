@@ -55,6 +55,9 @@ class InstallCommand extends Command
 	// Update web routes
 	$this->updateWebRoutes();
 
+	// Register API routes
+	$this->registerApiRoutes();
+
 		// Update Fortify config to use Filament login
 		$this->updateFortifyConfig();
 
@@ -115,6 +118,13 @@ class InstallCommand extends Command
 		'--force' => true,
 	]);
 	$this->info('✓ Seeders published');
+
+	// Publish API files (controllers, requests, resources, middleware)
+	$this->call('vendor:publish', [
+		'--tag' => 'cms-core-api',
+		'--force' => true,
+	]);
+	$this->info('✓ API files published');
 
 	// Run migrations
 		if ($this->option('fresh'))
@@ -461,6 +471,42 @@ class InstallCommand extends Command
 
 		file_put_contents($routesPath, $content);
 		$this->info('✓ Root route redirects to /admin');
+	}
+
+	protected function registerApiRoutes(): void
+	{
+		$apiRoutesPath = base_path('routes/api.php');
+
+		if (!file_exists($apiRoutesPath))
+		{
+			$this->warn('  api.php not found, skipping API routes registration');
+			return;
+		}
+
+		$content = file_get_contents($apiRoutesPath);
+
+		// Check if CMS-Core API routes are already registered
+		if (str_contains($content, 'cms-core::posts') || str_contains($content, 'PostController'))
+		{
+			$this->info('✓ API routes already registered');
+			return;
+		}
+
+		// Add CMS-Core API routes
+		$apiRoutes = "\n// CMS-Core API Routes\n";
+		$apiRoutes .= "use App\\Http\\Controllers\\Api\\PostController;\n";
+		$apiRoutes .= "use App\\Http\\Middleware\\AuthenticateApiToken;\n\n";
+		$apiRoutes .= "// Posts API - Requires authentication via Bearer token or APP_TOKEN from .env\n";
+		$apiRoutes .= "Route::middleware(['auth:sanctum', AuthenticateApiToken::class])->group(function () {\n";
+		$apiRoutes .= "    Route::get('/posts', [PostController::class, 'index']);\n";
+		$apiRoutes .= "    Route::get('/posts/{slug}', [PostController::class, 'show']);\n";
+		$apiRoutes .= "});\n";
+
+		// Append to the end of the file
+		$content .= $apiRoutes;
+
+		file_put_contents($apiRoutesPath, $content);
+		$this->info('✓ API routes registered');
 	}
 
 	protected function updateFortifyConfig(): void

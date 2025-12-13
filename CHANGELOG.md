@@ -2,6 +2,40 @@
 
 All notable changes to `cms-core` will be documented in this file.
 
+## v1.3.0 - 2024-12-13
+
+### Added
+- **REST API for Posts** with authentication via Sanctum tokens
+  - `GET /api/posts` - List posts with filters (status, category, tag, search, pagination)
+  - `GET /api/posts/{slug}` - Get post details by slug
+  - Full filtering support: status, category, tag, search
+  - Pagination support (per_page, page)
+  - Team scoping automatically applied when teams are enabled
+- **API Token Management**
+  - New command `cms-core:api-token` to generate API tokens
+  - Support for `APP_TOKEN` environment variable for application-level authentication
+  - `AuthenticateApiToken` middleware for token-based authentication
+- **API Resources**
+  - `PostResource` for formatted API responses
+  - Includes featured images, gallery, categories, and tags
+  - Author information included in responses
+- **API Documentation**
+  - Complete API documentation in README
+  - cURL examples for all endpoints
+  - Authentication guide with token generation
+- **Automatic API Setup**
+  - API files (controllers, requests, resources, middleware) are automatically published
+  - API routes are automatically registered during installation/update
+  - `cms-core:update` command now includes API files and routes
+
+### Changed
+- `cms-core:update` command now publishes API files and registers routes automatically
+- README updated with comprehensive API documentation and examples
+
+### Fixed
+- Improved route registration to prevent duplicates
+- Better error handling in API endpoints
+
 ## v1.2.10 - 2024-12-09
 
 ### Fixed

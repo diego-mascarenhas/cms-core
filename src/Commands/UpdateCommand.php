@@ -68,12 +68,61 @@ class UpdateCommand extends Command
 		]);
 		$this->info('✓ CMS Core migrations updated');
 
+		// Publish API files (controllers, requests, resources, middleware)
+		$this->call('vendor:publish', [
+			'--tag' => 'cms-core-api',
+			'--force' => $force,
+		]);
+		$this->info('✓ API files updated');
+
+		// Register API routes
+		$this->registerApiRoutes();
+
 		$this->newLine();
 		$this->info('CMS-Core resources updated successfully!');
 		$this->newLine();
-		$this->comment('Run "php artisan migrate" to apply new migrations.');
+		$this->comment('Run "php artisan migrate" to apply new migrations (if any).');
 
 		return self::SUCCESS;
+	}
+
+	/**
+	 * Register API routes in routes/api.php.
+	 */
+	protected function registerApiRoutes(): void
+	{
+		$apiRoutesPath = base_path('routes/api.php');
+
+		if (!file_exists($apiRoutesPath))
+		{
+			$this->warn('  api.php not found, skipping API routes registration');
+			return;
+		}
+
+		$content = file_get_contents($apiRoutesPath);
+
+		// Check if CMS-Core API routes are already registered
+		if (str_contains($content, 'PostController') && str_contains($content, '/posts'))
+		{
+			$this->info('✓ API routes already registered');
+			return;
+		}
+
+		// Add CMS-Core API routes
+		$apiRoutes = "\n// CMS-Core API Routes\n";
+		$apiRoutes .= "use App\\Http\\Controllers\\Api\\PostController;\n";
+		$apiRoutes .= "use App\\Http\\Middleware\\AuthenticateApiToken;\n\n";
+		$apiRoutes .= "// Posts API - Requires authentication via Bearer token or APP_TOKEN from .env\n";
+		$apiRoutes .= "Route::middleware(['auth:sanctum', AuthenticateApiToken::class])->group(function () {\n";
+		$apiRoutes .= "    Route::get('/posts', [PostController::class, 'index']);\n";
+		$apiRoutes .= "    Route::get('/posts/{slug}', [PostController::class, 'show']);\n";
+		$apiRoutes .= "});\n";
+
+		// Append to the end of the file
+		$content .= $apiRoutes;
+
+		file_put_contents($apiRoutesPath, $content);
+		$this->info('✓ API routes registered');
 	}
 
 	/**
