@@ -155,6 +155,7 @@ class PostResource extends Resource
 				SpatieMediaLibraryImageColumn::make('featured')
 					->label(__('Featured'))
 					->collection('featured')
+					->conversion('thumb')
 					->size(50),
 
 				Tables\Columns\TextColumn::make('title')

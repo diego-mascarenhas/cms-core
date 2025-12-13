@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Idoneo\CmsCore\Traits\BelongsToCurrentTeam;
+use Spatie\Image\Enums\Fit;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
@@ -49,16 +50,24 @@ class Post extends Model implements HasMedia
 	 */
 	public function registerMediaConversions(?Media $media = null): void
 	{
+		// Thumbnail for listings (small, square, fast loading)
 		$this->addMediaConversion('thumb')
-			->width(300)
-			->height(300)
+			->width(150)
+			->height(150)
+			->fit(Fit::Crop, 150, 150)
 			->sharpen(10)
+			->quality(85)
+			->nonQueued()
 			->performOnCollections('featured', 'gallery');
 
-		$this->addMediaConversion('large')
-			->width(1200)
-			->height(800)
+		// Standard web size (optimized for web display)
+		$this->addMediaConversion('web')
+			->width(800)
+			->height(600)
+			->fit(Fit::Contain, 800, 600)
 			->sharpen(10)
+			->quality(90)
+			->nonQueued()
 			->performOnCollections('featured', 'gallery');
 	}
 
