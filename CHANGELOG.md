@@ -2,6 +2,12 @@
 
 All notable changes to `cms-core` will be documented in this file.
 
+## v1.3.8 - 2024-12-13
+
+### Fixed
+- **Fixed update command not showing which migrations are being kept** - Added more verbose output when removing duplicate migrations
+- Improved duplicate migration detection messages
+
 ## v1.3.7 - 2024-12-13
 
 ### Added

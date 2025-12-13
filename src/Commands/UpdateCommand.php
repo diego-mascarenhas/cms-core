@@ -288,6 +288,7 @@ class UpdateCommand extends Command
 			if ($migrations->count() > 1)
 			{
 				$firstMigration = $migrations->first();
+				$this->info("Found {$migrations->count()} {$type} migrations, keeping: {$firstMigration->getFilename()}");
 
 				foreach ($migrations as $migration)
 				{
