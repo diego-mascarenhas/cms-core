@@ -69,8 +69,8 @@ class UpdateCommand extends Command
 		// Rename tags migration to sequential format
 		$this->renameTagsMigration();
 
-		// Remove duplicate two_factor migrations
-		$this->removeDuplicateTwoFactorMigrations();
+		// Remove duplicate migrations (two_factor, teams, etc.)
+		$this->removeDuplicateMigrations();
 
 		// Publish CMS Core migrations
 		$this->call('vendor:publish', [
@@ -242,9 +242,9 @@ class UpdateCommand extends Command
 	}
 
 	/**
-	 * Remove duplicate two_factor migrations.
+	 * Remove duplicate migrations (two_factor, teams, etc.).
 	 */
-	protected function removeDuplicateTwoFactorMigrations(): void
+	protected function removeDuplicateMigrations(): void
 	{
 		$migrationsPath = database_path('migrations');
 
@@ -253,28 +253,46 @@ class UpdateCommand extends Command
 			return;
 		}
 
-		// Find all two_factor migrations
-		$twoFactorMigrations = collect(File::files($migrationsPath))
-			->filter(function ($file) {
-				return str_contains($file->getFilename(), 'two_factor') ||
-				       str_contains($file->getFilename(), 'two-factor');
-			})
-			->sortBy(function ($file) {
-				return $file->getFilename();
-			})
-			->values();
+		// Patterns to detect duplicate migrations
+		$patterns = [
+			'two_factor' => ['two_factor', 'two-factor'],
+			'teams' => ['create_teams_table', 'teams_table'],
+			'team_user' => ['create_team_user_table', 'team_user_table'],
+			'team_invitations' => ['create_team_invitations_table', 'team_invitations_table'],
+		];
 
-		// If there are duplicates, keep only the first one
-		if ($twoFactorMigrations->count() > 1)
+		foreach ($patterns as $type => $searchTerms)
 		{
-			$firstMigration = $twoFactorMigrations->first();
+			// Find all migrations matching this pattern
+			$migrations = collect(File::files($migrationsPath))
+				->filter(function ($file) use ($searchTerms) {
+					$filename = $file->getFilename();
+					foreach ($searchTerms as $term)
+					{
+						if (str_contains($filename, $term))
+						{
+							return true;
+						}
+					}
+					return false;
+				})
+				->sortBy(function ($file) {
+					return $file->getFilename();
+				})
+				->values();
 
-			foreach ($twoFactorMigrations as $migration)
+			// If there are duplicates, keep only the first one
+			if ($migrations->count() > 1)
 			{
-				if ($migration->getPathname() !== $firstMigration->getPathname())
+				$firstMigration = $migrations->first();
+
+				foreach ($migrations as $migration)
 				{
-					File::delete($migration->getPathname());
-					$this->info("✓ Removed duplicate two_factor migration: {$migration->getFilename()}");
+					if ($migration->getPathname() !== $firstMigration->getPathname())
+					{
+						File::delete($migration->getPathname());
+						$this->info("✓ Removed duplicate {$type} migration: {$migration->getFilename()}");
+					}
 				}
 			}
 		}

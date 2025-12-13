@@ -2,14 +2,27 @@
 
 All notable changes to `cms-core` will be documented in this file.
 
+## v1.3.6 - 2024-12-13
+
+### Fixed
+- **Fixed duplicate teams migrations** - Generic method `removeDuplicateMigrations()` now handles duplicate migrations for:
+  - `create_teams_table` (prevents "Table already exists" errors)
+  - `create_team_user_table` (prevents "Table already exists" errors)
+  - `create_team_invitations_table` (prevents "Table already exists" errors)
+- Replaced specific `removeDuplicateTwoFactorMigrations()` with generic `removeDuplicateMigrations()` method
+- Method now handles multiple migration types in a single pass for better performance
+
 ## v1.3.5 - 2024-12-13
 
 ### Fixed
 - **Fixed Media Library migrations tag** - Changed from `migrations` to `medialibrary-migrations` to correctly publish media table
 - **Improved tags migration handling** - Automatically removes duplicate tags migrations if table already exists
 - `renameTagsMigration()` now checks if `tags` table exists and removes duplicate migrations instead of creating new ones
-- **Fixed duplicate two_factor migrations** - Automatically removes duplicate `two_factor_columns_to_users_table` migrations
-- New method `removeDuplicateTwoFactorMigrations()` prevents "Duplicate column name" errors during fresh installations
+- **Fixed duplicate migrations** - New generic method `removeDuplicateMigrations()` automatically removes duplicate migrations for:
+  - `two_factor_columns_to_users_table` (prevents "Duplicate column name" errors)
+  - `create_teams_table` (prevents "Table already exists" errors)
+  - `create_team_user_table` (prevents "Table already exists" errors)
+  - `create_team_invitations_table` (prevents "Table already exists" errors)
 - Simplified migration duplicate detection (no longer queries migrations table, just checks if table exists)
 - Use `--force` flag with `cms-core:update` to force overwrite existing files (e.g., `php artisan cms-core:update --force`)
 
