@@ -3,6 +3,7 @@
 namespace Idoneo\CmsCore\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
 
 class InstallCommand extends Command
@@ -76,6 +77,16 @@ class InstallCommand extends Command
 			'--provider' => 'Spatie\Permission\PermissionServiceProvider',
 		]);
 		$this->info('✓ Permission migrations published');
+
+		// Publish Spatie Tags migrations
+		$this->call('vendor:publish', [
+			'--provider' => 'Spatie\Tags\TagsServiceProvider',
+			'--tag' => 'tags-migrations',
+		]);
+		$this->info('✓ Tags migrations published');
+
+		// Rename tags migration to sequential format
+		$this->renameTagsMigration();
 
 		// Publish CMS Core migrations
 		$this->call('vendor:publish', [
@@ -521,5 +532,73 @@ class InstallCommand extends Command
 	{
 		// No longer needed - Filament handles authentication with ->default() and ->login()
 		$this->info('✓ Bootstrap app ready (Filament handles auth)');
+	}
+
+	/**
+	 * Rename tags migration to sequential format.
+	 */
+	protected function renameTagsMigration(): void
+	{
+		$migrationsPath = database_path('migrations');
+
+		if (!File::isDirectory($migrationsPath))
+		{
+			return;
+		}
+
+		// Find the tags migration file
+		$tagsMigration = collect(File::files($migrationsPath))
+			->first(function ($file) {
+				return str_contains($file->getFilename(), 'create_tag_tables');
+			});
+
+		if (!$tagsMigration)
+		{
+			return;
+		}
+
+		// Get all migration files to determine next sequential number
+		$migrations = collect(File::files($migrationsPath))
+			->map(fn ($file) => $file->getFilename())
+			->filter(fn ($filename) => preg_match('/^\d{4}_\d{2}_\d{2}_\d{6}_/', $filename))
+			->sort()
+			->values();
+
+		// Find the highest sequence number and date
+		$maxSequence = 0;
+		$lastDate = now()->format('Y_m_d');
+
+		foreach ($migrations as $migration)
+		{
+			if (preg_match('/^(\d{4}_\d{2}_\d{2})_(\d{6})_/', $migration, $matches))
+			{
+				$date = $matches[1];
+				$sequence = (int) $matches[2];
+
+				if ($date === $lastDate)
+				{
+					$maxSequence = max($maxSequence, $sequence);
+				}
+				elseif ($date > $lastDate)
+				{
+					$lastDate = $date;
+					$maxSequence = $sequence;
+				}
+			}
+		}
+
+		// Generate new sequential number (next after max)
+		$newSequence = str_pad($maxSequence + 1, 6, '0', STR_PAD_LEFT);
+		$newFilename = "{$lastDate}_{$newSequence}_create_tag_tables.php";
+
+		// Rename the file
+		$oldPath = $tagsMigration->getPathname();
+		$newPath = $migrationsPath . '/' . $newFilename;
+
+		if (File::exists($oldPath) && !File::exists($newPath))
+		{
+			File::move($oldPath, $newPath);
+			$this->info("✓ Tags migration renamed to: {$newFilename}");
+		}
 	}
 }

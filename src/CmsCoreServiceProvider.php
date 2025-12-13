@@ -42,6 +42,8 @@ class CmsCoreServiceProvider extends ServiceProvider
 		{
 			$this->commands([
 				InstallCommand::class,
+				\Idoneo\CmsCore\Commands\UpdateCommand::class,
+				\Idoneo\CmsCore\Commands\CreateAdminCommand::class,
 			]);
 		}
 	}

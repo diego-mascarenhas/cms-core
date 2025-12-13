@@ -11,6 +11,7 @@ Multi-tenant CMS foundation with Teams support, Livewire components and Filament
 - **BelongsToCurrentTeam** trait for automatic team scoping
 - **TeamSwitcher** Livewire component with alphabetical sorting
 - **CmsCorePlugin** for Filament panels with user menu
+- **Spatie Laravel Tags** integration for tagging and categorization
 - Toggle teams feature via environment variable
 
 ## Installation
@@ -75,6 +76,30 @@ public function panel(Panel $panel): Panel
 {
     return $panel
         ->plugin(CmsCorePlugin::make())
+```
+
+## Tags System
+
+This package includes Spatie Laravel Tags for tagging and categorization. See [docs/TAGS.md](docs/TAGS.md) for complete documentation.
+
+Quick example:
+
+```php
+use Spatie\Tags\HasTags;
+use Filament\Forms\Components\SpatieTagsInput;
+
+class Post extends Model
+{
+    use HasTags;
+}
+
+// In Filament Resource
+SpatieTagsInput::make('tags')
+    ->label('Tags')
+
+// For categorization
+SpatieTagsInput::make('categories')
+    ->type('categories')
         // ... other configuration
 }
 ```

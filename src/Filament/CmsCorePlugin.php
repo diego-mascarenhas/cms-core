@@ -21,6 +21,7 @@ class CmsCorePlugin implements Plugin
 			->userMenuItems($this->getUserMenuItems())
 			->resources([
 				\Idoneo\CmsCore\Filament\Resources\UserResource::class,
+				\Idoneo\CmsCore\Filament\Resources\PostResource::class,
 			])
 			->widgets([
 				\Idoneo\CmsCore\Filament\Widgets\UserStatsOverview::class,
