@@ -5,8 +5,6 @@ namespace Idoneo\CmsCore\Filament;
 use Filament\Contracts\Plugin;
 use Filament\Navigation\MenuItem;
 use Filament\Panel;
-use Filament\Support\Assets\Css;
-use Filament\Support\Facades\FilamentView;
 use Idoneo\CmsCore\CmsCore;
 use Illuminate\Support\Facades\File;
 
@@ -31,9 +29,6 @@ class CmsCorePlugin implements Plugin
 
 		// Auto-configure logos if they exist
 		$this->configureBrandLogos($panel);
-
-		// Auto-configure custom styles if they exist
-		$this->configureCustomStyles($panel);
 	}
 
 	public function boot(Panel $panel): void
@@ -137,32 +132,5 @@ class CmsCorePlugin implements Plugin
 		{
 			$panel->darkModeBrandLogo(asset($logoDark));
 		}
-	}
-
-	/**
-	 * Automatically configure custom styles if CSS files exist in public/custom/.
-	 */
-	protected function configureCustomStyles(Panel $panel): void
-	{
-		$customPath = public_path('custom');
-
-		if (!File::isDirectory($customPath))
-		{
-			return;
-		}
-
-		$cssFiles = File::glob($customPath . '/*.css');
-
-		if (empty($cssFiles))
-		{
-			return;
-		}
-
-		$cssAssets = array_map(function ($cssFile) {
-			$filename = basename($cssFile);
-			return Css::make('custom-' . basename($filename, '.css'), asset('custom/' . $filename));
-		}, $cssFiles);
-
-		$panel->assets($cssAssets);
 	}
 }
