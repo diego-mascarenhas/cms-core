@@ -5,6 +5,7 @@ namespace Idoneo\CmsCore\Filament;
 use Filament\Contracts\Plugin;
 use Filament\Navigation\MenuItem;
 use Filament\Panel;
+use Filament\Support\Assets\Css;
 use Filament\Support\Facades\FilamentView;
 use Idoneo\CmsCore\CmsCore;
 use Illuminate\Support\Facades\File;
@@ -30,6 +31,9 @@ class CmsCorePlugin implements Plugin
 
 		// Auto-configure logos if they exist
 		$this->configureBrandLogos($panel);
+
+		// Auto-configure custom styles if they exist
+		$this->configureCustomStyles($panel);
 	}
 
 	public function boot(Panel $panel): void
@@ -87,47 +91,40 @@ class CmsCorePlugin implements Plugin
 	}
 
 	/**
-	 * Automatically configure brand logos if logo-*.svg files exist in public directory.
+	 * Automatically configure brand logos if logo-*.svg files exist in public/custom/.
 	 */
 	protected function configureBrandLogos(Panel $panel): void
 	{
-		$publicPath = public_path();
+		$customPath = public_path('custom');
 
-		// Find all logo-*.svg files
-		$logoFiles = File::glob($publicPath . '/logo-*.svg');
+		if (!File::isDirectory($customPath))
+		{
+			return;
+		}
+
+		$logoFiles = File::glob($customPath . '/logo-*.svg');
 
 		if (empty($logoFiles))
 		{
 			return;
 		}
 
-		// Extract just the filenames
-		$logoFilenames = array_map(function ($path) use ($publicPath) {
-			return str_replace($publicPath . '/', '', $path);
-		}, $logoFiles);
-
-		// Look for specific patterns
+		// Look for logo-light.svg and logo-dark.svg
 		$logoLight = null;
 		$logoDark = null;
 
-		foreach ($logoFilenames as $filename)
+		foreach ($logoFiles as $logoFile)
 		{
-			// Check for light mode variants
-			if (preg_match('/logo-(light|white|claro)\.svg$/i', $filename))
-			{
-				$logoLight = $filename;
-			}
-			// Check for dark mode variants
-			elseif (preg_match('/logo-(dark|black|oscuro)\.svg$/i', $filename))
-			{
-				$logoDark = $filename;
-			}
-		}
+			$filename = basename($logoFile);
 
-		// If no specific light/dark found, use the first logo as default
-		if (!$logoLight && !$logoDark && !empty($logoFilenames))
-		{
-			$logoLight = $logoFilenames[0];
+			if ($filename === 'logo-light.svg')
+			{
+				$logoLight = 'custom/' . $filename;
+			}
+			elseif ($filename === 'logo-dark.svg')
+			{
+				$logoDark = 'custom/' . $filename;
+			}
 		}
 
 		// Configure logos
@@ -140,5 +137,32 @@ class CmsCorePlugin implements Plugin
 		{
 			$panel->darkModeBrandLogo(asset($logoDark));
 		}
+	}
+
+	/**
+	 * Automatically configure custom styles if CSS files exist in public/custom/.
+	 */
+	protected function configureCustomStyles(Panel $panel): void
+	{
+		$customPath = public_path('custom');
+
+		if (!File::isDirectory($customPath))
+		{
+			return;
+		}
+
+		$cssFiles = File::glob($customPath . '/*.css');
+
+		if (empty($cssFiles))
+		{
+			return;
+		}
+
+		$cssAssets = array_map(function ($cssFile) {
+			$filename = basename($cssFile);
+			return Css::make('custom-' . basename($filename, '.css'), asset('custom/' . $filename));
+		}, $cssFiles);
+
+		$panel->assets($cssAssets);
 	}
 }
