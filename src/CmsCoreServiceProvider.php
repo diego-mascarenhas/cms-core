@@ -89,6 +89,11 @@ class CmsCoreServiceProvider extends ServiceProvider
 			__DIR__ . '/../database/seeders/DatabaseSeeder.php' => database_path('seeders/DatabaseSeeder.php'),
 		], 'cms-core-seeders');
 
+		// Models
+		$this->publishes([
+			__DIR__ . '/../app/Models/Post.php' => app_path('Models/Post.php'),
+		], 'cms-core-models');
+
 		// API Controllers, Requests, Resources, Middleware
 		$this->publishes([
 			__DIR__ . '/../app/Http/Controllers/Api' => app_path('Http/Controllers/Api'),
