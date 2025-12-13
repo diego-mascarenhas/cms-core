@@ -68,6 +68,13 @@ class UpdateCommand extends Command
 		]);
 		$this->info('✓ CMS Core migrations updated');
 
+		// Publish models
+		$this->call('vendor:publish', [
+			'--tag' => 'cms-core-models',
+			'--force' => $force,
+		]);
+		$this->info('✓ Models updated');
+
 		// Publish API files (controllers, requests, resources, middleware)
 		$this->call('vendor:publish', [
 			'--tag' => 'cms-core-api',

@@ -2,6 +2,13 @@
 
 All notable changes to `cms-core` will be documented in this file.
 
+## v1.3.1 - 2024-12-13
+
+### Fixed
+- **Post model now automatically published during installation** - Fixed "Class App\Models\Post not found" error
+- Post model is now included in `cms-core-models` publishable tag
+- Models are automatically published during `cms-core:install` and `cms-core:update`
+
 ## v1.3.0 - 2024-12-13
 
 ### Added

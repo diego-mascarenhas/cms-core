@@ -119,6 +119,13 @@ class InstallCommand extends Command
 	]);
 	$this->info('✓ Seeders published');
 
+	// Publish models
+	$this->call('vendor:publish', [
+		'--tag' => 'cms-core-models',
+		'--force' => true,
+	]);
+	$this->info('✓ Models published');
+
 	// Publish API files (controllers, requests, resources, middleware)
 	$this->call('vendor:publish', [
 		'--tag' => 'cms-core-api',
