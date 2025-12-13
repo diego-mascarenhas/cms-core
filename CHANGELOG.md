@@ -2,6 +2,12 @@
 
 All notable changes to `cms-core` will be documented in this file.
 
+## v1.3.9 - 2024-12-13
+
+### Fixed
+- **Automatic removal of teams migrations if tables already exist** - Update command now removes teams migrations when updating existing projects
+- Prevents "Table already exists" errors when updating from older versions
+
 ## v1.3.8 - 2024-12-13
 
 ### Fixed

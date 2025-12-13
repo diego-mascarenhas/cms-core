@@ -315,6 +315,26 @@ class UpdateCommand extends Command
 			return;
 		}
 
+		// Check if teams tables already exist - if so, remove their migrations
+		if (Schema::hasTable('teams'))
+		{
+			$this->info('Teams table already exists, removing duplicate migrations...');
+			
+			$teamsMigrations = collect(File::files($migrationsPath))
+				->filter(function ($file) {
+					$filename = $file->getFilename();
+					return str_contains($filename, 'create_teams_table') ||
+					       str_contains($filename, 'create_team_user_table') ||
+					       str_contains($filename, 'create_team_invitations_table');
+				});
+
+			foreach ($teamsMigrations as $migration)
+			{
+				File::delete($migration->getPathname());
+				$this->info("✓ Removed teams migration (table already exists): {$migration->getFilename()}");
+			}
+		}
+
 		// Find all two_factor migrations and check their content
 		$twoFactorMigrations = collect(File::files($migrationsPath))
 			->filter(function ($file) {
