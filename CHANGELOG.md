@@ -2,6 +2,46 @@
 
 All notable changes to `cms-core` will be documented in this file.
 
+## v1.4.0 - 2024-12-14
+
+### Added
+- **Role-Based Permissions System** with PostPolicy and UserPolicy
+- **PostPolicy**: Controls access to posts based on user role
+  - Admin can edit/delete any post
+  - Members can only edit/delete their own posts
+- **UserPolicy**: Restricts user management to admin role only
+  - Only admin can view, create, edit, and delete users
+  - Members have no access to users resource
+- **Category Management Restrictions**
+  - Only admin can create/edit categories in posts
+  - Members can view but not create categories
+- **Post Filtering by User Role**
+  - Admin sees all posts in the system
+  - Members only see their own posts
+- **AuthServiceProvider** for policy registration
+- Automatic AuthServiceProvider registration in bootstrap/providers.php
+- Update command now publishes policies and providers
+- Comprehensive documentation in `docs/role-permissions-update.md`
+- Update guide in `docs/update-guide.md`
+
+### Changed
+- **Default role changed from 'guest' to 'member'** for new users
+- UserResource now checks 'viewAny' policy before showing navigation
+- PostResource includes canManageCategories() method
+- ListPosts page filters posts based on user role
+
+### Fixed
+- Guest role deprecation - existing 'guest' users should be migrated to 'member'
+- Removed unnecessary data migration (manual update preferred)
+
+### Breaking Changes
+- Existing installations need to manually update user roles in database
+- AuthServiceProvider must be registered in bootstrap/providers.php
+
+### Update Instructions
+Run `php artisan cms-core:update --force` to get new policies and providers.
+Then manually update user roles in database (see docs/update-guide.md).
+
 ## v1.3.12 - 2024-12-14
 
 ### Changed

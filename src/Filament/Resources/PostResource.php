@@ -47,6 +47,25 @@ class PostResource extends Resource
 		return __('Posts');
 	}
 
+	/**
+	 * Check if the current user can manage categories.
+	 */
+	public static function canManageCategories(): bool
+	{
+		$user = auth()->user();
+
+		if (!$user || !$user->currentTeam)
+		{
+			return false;
+		}
+
+		$membership = $user->currentTeam->users()
+			->where('user_id', $user->id)
+			->first();
+
+		return $membership?->membership->role === 'admin';
+	}
+
 	public static function form(Schema $schema): Schema
 	{
 		return $schema
@@ -128,6 +147,8 @@ class PostResource extends Resource
 							->type('categories')
 							->placeholder(__('Add categories'))
 							->nullable()
+							->visible(fn () => static::canManageCategories())
+							->disabled(fn () => !static::canManageCategories())
 							->columnSpanFull(),
 					]),
 

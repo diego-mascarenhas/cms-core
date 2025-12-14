@@ -10,11 +10,14 @@ use Filament\Support\Enums\IconPosition;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Idoneo\CmsCore\Filament\Resources\UserResource\Pages;
+use Illuminate\Database\Eloquent\Builder;
 use Laravel\Jetstream\Jetstream;
 
 class UserResource extends Resource
 {
 	protected static ?string $model = User::class;
+
+	protected static ?string $recordTitleAttribute = 'name';
 
 	public static function getNavigationIcon(): ?string
 	{
@@ -79,10 +82,7 @@ class UserResource extends Resource
 					return [$role->key => $role->name];
 				})->toArray();
 			})
-		->default(function () {
-			$roles = Jetstream::$roles;
-			return !empty($roles) ? $roles[array_key_last($roles)]->key : 'guest';
-		})
+		->default('member')
 			->required()
 			->extraAttributes(['required' => false])
 			->helperText(__('Role is assigned to user personal team'))
@@ -137,10 +137,9 @@ class UserResource extends Resource
 					$membership = $record->currentTeam->users()
 						->where('user_id', $record->id)
 						->first();
-				$defaultRole = !empty(Jetstream::$roles) ? Jetstream::$roles[array_key_last(Jetstream::$roles)]->key : 'viewer';
-				return $membership?->membership->role ?? $defaultRole;
+				return $membership?->membership->role ?? 'member';
 			}
-			return !empty(Jetstream::$roles) ? Jetstream::$roles[array_key_last(Jetstream::$roles)]->key : 'viewer';
+			return 'member';
 			}),
 
 		Tables\Columns\TextColumn::make('email_verified_at')
@@ -180,5 +179,10 @@ class UserResource extends Resource
 			'create' => Pages\CreateUser::route('/create'),
 			'edit' => Pages\EditUser::route('/{record}/edit'),
 		];
+	}
+
+	public static function canViewAny(): bool
+	{
+		return auth()->check() && auth()->user()->can('viewAny', User::class);
 	}
 }

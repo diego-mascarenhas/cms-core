@@ -89,6 +89,23 @@ class UpdateCommand extends Command
 		]);
 		$this->info('✓ Models updated');
 
+		// Publish policies
+		$this->call('vendor:publish', [
+			'--tag' => 'cms-core-policies',
+			'--force' => $force,
+		]);
+		$this->info('✓ Policies updated');
+
+		// Publish providers
+		$this->call('vendor:publish', [
+			'--tag' => 'cms-core-providers',
+			'--force' => $force,
+		]);
+		$this->info('✓ Providers updated');
+
+		// Register AuthServiceProvider in bootstrap/providers.php
+		$this->registerAuthServiceProvider();
+
 		// Publish API files (controllers, requests, resources, middleware)
 		$this->call('vendor:publish', [
 			'--tag' => 'cms-core-api',
@@ -144,6 +161,56 @@ class UpdateCommand extends Command
 
 		file_put_contents($apiRoutesPath, $content);
 		$this->info('✓ API routes registered');
+	}
+
+	/**
+	 * Register AuthServiceProvider in bootstrap/providers.php.
+	 */
+	protected function registerAuthServiceProvider(): void
+	{
+		$providersPath = base_path('bootstrap/providers.php');
+
+		if (!file_exists($providersPath))
+		{
+			$this->warn('  bootstrap/providers.php not found, skipping AuthServiceProvider registration');
+			return;
+		}
+
+		$content = file_get_contents($providersPath);
+
+		// Check if AuthServiceProvider is already registered
+		if (str_contains($content, 'AuthServiceProvider'))
+		{
+			$this->info('✓ AuthServiceProvider already registered');
+			return;
+		}
+
+		// Find the position to insert (after AppServiceProvider)
+		$lines = explode("\n", $content);
+		$newLines = [];
+		$inserted = false;
+
+		foreach ($lines as $line)
+		{
+			$newLines[] = $line;
+
+			// Insert after AppServiceProvider
+			if (!$inserted && str_contains($line, 'AppServiceProvider'))
+			{
+				$newLines[] = "    App\\Providers\\AuthServiceProvider::class,";
+				$inserted = true;
+			}
+		}
+
+		if ($inserted)
+		{
+			file_put_contents($providersPath, implode("\n", $newLines));
+			$this->info('✓ AuthServiceProvider registered in bootstrap/providers.php');
+		}
+		else
+		{
+			$this->warn('  Could not find AppServiceProvider in bootstrap/providers.php');
+		}
 	}
 
 	/**

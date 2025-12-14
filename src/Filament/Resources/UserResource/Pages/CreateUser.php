@@ -13,11 +13,8 @@ class CreateUser extends CreateRecord
 
 	protected function mutateFormDataBeforeCreate(array $data): array
 	{
-		// Get default role from Jetstream
-		$defaultRole = !empty(Jetstream::$roles) ? Jetstream::$roles[array_key_last(Jetstream::$roles)]->key : 'guest';
-
 		// Store role temporarily, will be assigned after team creation
-		$this->cachedRole = $data['role'] ?? $defaultRole;
+		$this->cachedRole = $data['role'] ?? 'member';
 
 		// Remove role from data as it's not a User table column
 		unset($data['role']);
@@ -45,9 +42,8 @@ class CreateUser extends CreateRecord
 		// Attach user to their team with the selected role
 		if ($user->currentTeam)
 		{
-			$defaultRole = !empty(Jetstream::$roles) ? Jetstream::$roles[array_key_last(Jetstream::$roles)]->key : 'guest';
 			$user->currentTeam->users()->syncWithoutDetaching([
-				$user->id => ['role' => $this->cachedRole ?? $defaultRole]
+				$user->id => ['role' => $this->cachedRole ?? 'member']
 			]);
 		}
 	}

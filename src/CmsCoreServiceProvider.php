@@ -96,6 +96,17 @@ class CmsCoreServiceProvider extends ServiceProvider
 			__DIR__ . '/../app/Models/Post.php' => app_path('Models/Post.php'),
 		], 'cms-core-models');
 
+		// Policies
+		$this->publishes([
+			__DIR__ . '/../app/Policies/PostPolicy.php' => app_path('Policies/PostPolicy.php'),
+			__DIR__ . '/../app/Policies/UserPolicy.php' => app_path('Policies/UserPolicy.php'),
+		], 'cms-core-policies');
+
+		// Providers
+		$this->publishes([
+			__DIR__ . '/../app/Providers/AuthServiceProvider.php' => app_path('Providers/AuthServiceProvider.php'),
+		], 'cms-core-providers');
+
 		// API Controllers, Requests, Resources, Middleware
 		$this->publishes([
 			__DIR__ . '/../app/Http/Controllers/Api' => app_path('Http/Controllers/Api'),
