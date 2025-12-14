@@ -102,12 +102,12 @@ class InstallCommand extends Command
 		// Remove duplicate two_factor migrations only (if multiple exist)
 		$this->removeDuplicateTwoFactorMigrations();
 
-		// Publish CMS Core migrations (includes teams migrations)
+		// Publish CMS Core migrations
 		$this->call('vendor:publish', [
 			'--tag' => 'cms-core-migrations',
 			'--force' => true,
 		]);
-		$this->info('✓ CMS Core migrations published (including teams)');
+		$this->info('✓ CMS Core migrations published');
 
 		// Publish views
 		$this->call('vendor:publish', [
@@ -301,10 +301,10 @@ class InstallCommand extends Command
 			$content
 		);
 
-		// Add default(), login() and plugin
+		// Add default(), login(), spa() and plugin
 		$content = preg_replace(
 			'/(\->id\(\'admin\'\))(\s*\->)/s',
-			'$1' . "\n            ->default()\n            ->login()" . '$2',
+			'$1' . "\n            ->default()\n            ->login()\n            ->spa()" . '$2',
 			$content,
 			1
 		);

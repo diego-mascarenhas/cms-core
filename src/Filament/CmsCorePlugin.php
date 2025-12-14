@@ -66,7 +66,7 @@ class CmsCorePlugin implements Plugin
 			{
 				$items['cms-profile'] = MenuItem::make()
 					->label(__('Mi Perfil'))
-					->url(fn (): string => route('profile.show'))
+				->url(fn (): string => route('profile.show'))
 					->icon('heroicon-o-user')
 					->sort(10);
 			}
@@ -76,11 +76,11 @@ class CmsCorePlugin implements Plugin
 			{
 				$items['cms-team-settings'] = MenuItem::make()
 					->label(__('Ajustes del Equipo'))
-					->url(fn (): string => auth()->check() && auth()->user()->currentTeam
-						? route('teams.show', auth()->user()->currentTeam)
-						: '#'
-					)
-					->icon('heroicon-o-cog-6-tooth')
+				->url(fn (): string => auth()->check() && auth()->user()->currentTeam
+					? route('teams.show', auth()->user()->currentTeam)
+					: '#'
+				)
+				->icon('heroicon-o-cog-6-tooth')
 					->visible(fn (): bool => auth()->check() && auth()->user()->currentTeam !== null)
 					->sort(20);
 			}
@@ -90,10 +90,10 @@ class CmsCorePlugin implements Plugin
 			{
 				$items['cms-create-team'] = MenuItem::make()
 					->label(__('Crear Nuevo Equipo'))
-					->url(fn (): string => route('teams.create'))
+				->url(fn (): string => route('teams.create'))
 					->icon('heroicon-o-plus-circle')
 					->sort(30);
-			}
+		}
 		}
 
 		// Logout button with arrow pointing out

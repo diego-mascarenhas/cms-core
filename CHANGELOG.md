@@ -2,6 +2,17 @@
 
 All notable changes to `cms-core` will be documented in this file.
 
+## v1.3.11 - 2024-12-14
+
+### Changed
+- **Removed teams migrations from CMS-Core package** - Teams tables (`teams`, `team_user`, `team_invitations`) are now managed exclusively by Jetstream
+- Simplified migration strategy: Jetstream publishes and manages teams migrations naturally during installation
+- Removed `removeDuplicateTeamsMigrations()` method as it's no longer needed
+
+### Fixed
+- **Disabled Filament rating prompt** - Added `->spa()` configuration to AdminPanelProvider to disable the "Rate Filament" prompt
+- Resolved "Table 'teams' already exists" errors by letting Jetstream handle teams migrations
+
 ## v1.3.9 - 2024-12-13
 
 ### Fixed
