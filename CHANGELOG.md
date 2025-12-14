@@ -2,6 +2,41 @@
 
 All notable changes to `cms-core` will be documented in this file.
 
+## v1.4.4 - 2024-12-14
+
+### Fixed
+- **CRITICAL: Logout 405 error resolved** - Removed custom logout MenuItem from CmsCorePlugin that was using GET instead of POST
+- Filament now handles logout automatically with proper POST method via JavaScript
+- Fixes "405 Method Not Allowed" error when clicking logout button
+- **CRITICAL: DatabaseSeeder team_user relationship** - Admin user now properly linked to team with admin role
+- Fixes issue where users couldn't be created due to empty team_user table
+- Fixes issue where "Users" menu wouldn't appear for admin users
+- Role-based policies now work correctly with proper team_user relationships
+
+### Changed
+- CmsCorePlugin no longer customizes logout menu item (lines 99-104 removed)
+- Logout uses Filament's default behavior for security compliance
+- DatabaseSeeder now uses syncWithoutDetaching to ensure team_user pivot table is populated on install
+
+### Documentation
+- **NEW**: UPDATE-GUIDE.md - Comprehensive update guide with troubleshooting
+- **NEW**: CRITICAL-FIX-v1.4.4.md - Detailed explanation of critical fixes
+- **NEW**: POLICIES-GUIDE.md - Complete policy setup and troubleshooting guide
+- **NEW**: RELEASE-v1.4.4.md - Full release notes
+- **REMOVED**: Spanish documentation files (replaced with English versions)
+
+## v1.4.3 - 2024-12-14
+
+### Fixed
+- **InstallCommand now publishes AdminPanelProvider** - Fresh installations now get correct logout behavior
+- **InstallCommand now publishes policies** - Fresh installations now have role-based permissions
+- Added `registerAuthServiceProvider()` method to InstallCommand
+- Removed `registerPlugin()` call since AdminPanelProvider is now published
+
+### Critical
+- Fresh installations (cms-core:install) now work correctly with all v1.4.x features
+- No need to run update command after install
+
 ## v1.4.2 - 2024-12-14
 
 ### Fixed

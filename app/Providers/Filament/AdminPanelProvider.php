@@ -75,46 +75,50 @@ class AdminPanelProvider extends PanelProvider
         return config('cms.teams_enabled', true);
     }
 
-    /**
-     * Get custom user menu items.
-     */
-    protected function getUserMenuItems(): array
-    {
-        $items = [];
+	/**
+	 * Get custom user menu items.
+	 */
+	protected function getUserMenuItems(): array
+	{
+		$items = [];
 
-        // Mi Perfil
-        $items['profile'] = MenuItem::make()
-            ->label('Mi Perfil')
-            ->url(fn (): string => route('profile.show'))
-            ->icon('heroicon-o-user');
+		// Mi Perfil
+		if (\Route::has('profile.show')) {
+			$items['profile'] = MenuItem::make()
+				->label('Mi Perfil')
+				->url(fn (): string => route('profile.show'))
+				->icon('heroicon-o-user');
+		}
 
-        // Team-related items (only if teams are enabled)
-        if ($this->teamsEnabled())
-        {
-            // Ajustes del Equipo
-            $items['team-settings'] = MenuItem::make()
-                ->label('Ajustes del Equipo')
-                ->url(fn (): string => auth()->check() && auth()->user()->currentTeam
-                    ? route('teams.show', auth()->user()->currentTeam)
-                    : '#'
-                )
-                ->icon('heroicon-o-cog-6-tooth')
-                ->visible(fn (): bool => auth()->check() && auth()->user()->currentTeam !== null);
+		// Team-related items (only if teams are enabled)
+		if ($this->teamsEnabled())
+		{
+			// Ajustes del Equipo
+			if (\Route::has('teams.show')) {
+				$items['team-settings'] = MenuItem::make()
+					->label('Ajustes del Equipo')
+					->url(fn (): string => auth()->check() && auth()->user()->currentTeam
+						? route('teams.show', auth()->user()->currentTeam)
+						: '#'
+					)
+					->icon('heroicon-o-cog-6-tooth')
+					->visible(fn (): bool => auth()->check() && auth()->user()->currentTeam !== null);
+			}
 
-            // Crear Nuevo Equipo
-            $items['create-team'] = MenuItem::make()
-                ->label('Crear Nuevo Equipo')
-                ->url(fn (): string => route('teams.create'))
-                ->icon('heroicon-o-plus-circle');
-        }
+			// Crear Nuevo Equipo
+			if (\Route::has('teams.create')) {
+				$items['create-team'] = MenuItem::make()
+					->label('Crear Nuevo Equipo')
+					->url(fn (): string => route('teams.create'))
+					->icon('heroicon-o-plus-circle');
+			}
+		}
 
-        // Logout - always at the end with icon
-        $items['logout'] = MenuItem::make()
-            ->label('Salir')
-            ->icon('heroicon-o-arrow-right-on-rectangle');
+		// Don't customize logout - let Filament handle it with default behavior
+		// Filament will add the logout item automatically
 
-        return $items;
-    }
+		return $items;
+	}
 
     /**
      * Automatically configure brand logos if logo-light.svg or logo-dark.svg exist.

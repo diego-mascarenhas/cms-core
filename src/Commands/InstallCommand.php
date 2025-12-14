@@ -66,10 +66,9 @@ class InstallCommand extends Command
 		$this->call('filament:install', [
 			'--panels' => true,
 		]);
-		$this->info('✓ Filament panel installed');
+	$this->info('✓ Filament panel installed');
 
-		// Register CmsCore plugin in AdminPanelProvider
-		$this->registerPlugin();
+	// AdminPanelProvider will be published later with cms-core-providers
 
 	// Update User model
 	$this->updateUserModel();
@@ -163,6 +162,23 @@ class InstallCommand extends Command
 		'--force' => true,
 	]);
 	$this->info('✓ Models published');
+
+	// Publish policies
+	$this->call('vendor:publish', [
+		'--tag' => 'cms-core-policies',
+		'--force' => true,
+	]);
+	$this->info('✓ Policies published');
+
+	// Publish providers (AuthServiceProvider + AdminPanelProvider)
+	$this->call('vendor:publish', [
+		'--tag' => 'cms-core-providers',
+		'--force' => true,
+	]);
+	$this->info('✓ Providers published');
+
+	// Register AuthServiceProvider in bootstrap/providers.php
+	$this->registerAuthServiceProvider();
 
 	// Publish API files (controllers, requests, resources, middleware)
 	$this->call('vendor:publish', [
@@ -804,6 +820,56 @@ class InstallCommand extends Command
 					$this->info("✓ Removed duplicate two_factor migration: {$migration['file']->getFilename()}");
 				}
 			}
+		}
+	}
+
+	/**
+	 * Register AuthServiceProvider in bootstrap/providers.php.
+	 */
+	protected function registerAuthServiceProvider(): void
+	{
+		$providersPath = base_path('bootstrap/providers.php');
+
+		if (!file_exists($providersPath))
+		{
+			$this->warn('  bootstrap/providers.php not found, skipping AuthServiceProvider registration');
+			return;
+		}
+
+		$content = file_get_contents($providersPath);
+
+		// Check if AuthServiceProvider is already registered
+		if (str_contains($content, 'AuthServiceProvider'))
+		{
+			$this->info('✓ AuthServiceProvider already registered');
+			return;
+		}
+
+		// Find the position to insert (after AppServiceProvider)
+		$lines = explode("\n", $content);
+		$newLines = [];
+		$inserted = false;
+
+		foreach ($lines as $line)
+		{
+			$newLines[] = $line;
+
+			// Insert after AppServiceProvider
+			if (!$inserted && str_contains($line, 'AppServiceProvider'))
+			{
+				$newLines[] = "    App\\Providers\\AuthServiceProvider::class,";
+				$inserted = true;
+			}
+		}
+
+		if ($inserted)
+		{
+			file_put_contents($providersPath, implode("\n", $newLines));
+			$this->info('✓ AuthServiceProvider registered in bootstrap/providers.php');
+		}
+		else
+		{
+			$this->warn('  Could not find AppServiceProvider in bootstrap/providers.php');
 		}
 	}
 }

@@ -94,16 +94,12 @@ class CmsCorePlugin implements Plugin
 					->icon('heroicon-o-plus-circle')
 					->sort(30);
 		}
-		}
+	}
 
-		// Logout button with arrow pointing out
-		$items['logout'] = MenuItem::make()
-			->label(__('Salir'))
-			->url(fn (): string => \Filament\Facades\Filament::getLogoutUrl())
-			->icon('heroicon-o-arrow-right-start-on-rectangle')
-			->sort(999);
+	// Don't customize logout - let Filament handle it automatically
+	// Filament's default logout uses POST method for security
 
-		return $items;
+	return $items;
 	}
 
 	/**
