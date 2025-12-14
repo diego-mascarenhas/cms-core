@@ -4,6 +4,7 @@ namespace Idoneo\CmsCore;
 
 use Idoneo\CmsCore\Commands\CreateAdminCommand;
 use Idoneo\CmsCore\Commands\DiagnoseCommand;
+use Idoneo\CmsCore\Commands\DiagnosePoliciesCommand;
 use Idoneo\CmsCore\Commands\GenerateApiToken;
 use Idoneo\CmsCore\Commands\InstallCommand;
 use Idoneo\CmsCore\Commands\UpdateCommand;
@@ -50,6 +51,7 @@ class CmsCoreServiceProvider extends ServiceProvider
 				CreateAdminCommand::class,
 				GenerateApiToken::class,
 				DiagnoseCommand::class,
+				DiagnosePoliciesCommand::class,
 			]);
 		}
 	}

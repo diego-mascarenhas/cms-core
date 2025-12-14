@@ -111,9 +111,7 @@ class AdminPanelProvider extends PanelProvider
         // Logout - always at the end with icon
         $items['logout'] = MenuItem::make()
             ->label('Salir')
-            ->url(fn (): string => Filament::getLogoutUrl())
-            ->icon('heroicon-o-arrow-right-on-rectangle')
-            ->postAction(fn (): string => Filament::getLogoutUrl());
+            ->icon('heroicon-o-arrow-right-on-rectangle');
 
         return $items;
     }

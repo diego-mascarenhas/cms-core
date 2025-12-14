@@ -82,8 +82,9 @@ class UserResource extends Resource
 					return [$role->key => $role->name];
 				})->toArray();
 			})
-		->default('member')
+			->default('member')
 			->required()
+			->native(false)
 			->extraAttributes(['required' => false])
 			->helperText(__('Role is assigned to user personal team'))
 			->columnSpanFull(),

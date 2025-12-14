@@ -11,6 +11,14 @@ class CreateUser extends CreateRecord
 {
 	protected static string $resource = UserResource::class;
 
+	protected function mutateFormDataBeforeFill(array $data): array
+	{
+		// Set default role when form is initialized
+		$data['role'] = $data['role'] ?? 'member';
+
+		return $data;
+	}
+
 	protected function mutateFormDataBeforeCreate(array $data): array
 	{
 		// Store role temporarily, will be assigned after team creation

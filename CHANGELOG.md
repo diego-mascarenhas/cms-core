@@ -2,6 +2,22 @@
 
 All notable changes to `cms-core` will be documented in this file.
 
+## v1.4.1 - 2024-12-14
+
+### Added
+- **New diagnostic command**: `cms-core:diagnose-policies` to verify policy registration
+- FIX-POLICIES-NOW.md guide for troubleshooting policy issues
+
+### Fixed
+- **Logout method not allowed error** - Removed custom URL from logout menu item
+- **Role field not preselected** - Member role now appears selected by default when creating users
+- Added `native(false)` to role Select component for better default value handling
+- Added `mutateFormDataBeforeFill()` to ensure role field initializes with 'member'
+
+### Changed
+- Logout now uses Filament's default behavior (POST method)
+- DiagnosePoliciesCommand registered in service provider
+
 ## v1.4.0 - 2024-12-14
 
 ### Added
