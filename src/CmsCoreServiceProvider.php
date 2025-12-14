@@ -107,6 +107,7 @@ class CmsCoreServiceProvider extends ServiceProvider
 		// Providers
 		$this->publishes([
 			__DIR__ . '/../app/Providers/AuthServiceProvider.php' => app_path('Providers/AuthServiceProvider.php'),
+			__DIR__ . '/../app/Providers/Filament/AdminPanelProvider.php' => app_path('Providers/Filament/AdminPanelProvider.php'),
 		], 'cms-core-providers');
 
 		// API Controllers, Requests, Resources, Middleware

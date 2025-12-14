@@ -2,6 +2,15 @@
 
 All notable changes to `cms-core` will be documented in this file.
 
+## v1.4.2 - 2024-12-14
+
+### Fixed
+- **AdminPanelProvider now published correctly** - Added to cms-core-providers publishables
+- This ensures logout fix and user menu changes are applied when running update command
+
+### Critical
+- Users on v1.4.0 or v1.4.1 need to run `php artisan cms-core:update --force` to get the fixed AdminPanelProvider
+
 ## v1.4.1 - 2024-12-14
 
 ### Added
