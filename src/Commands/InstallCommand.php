@@ -21,6 +21,33 @@ class InstallCommand extends Command
 		$this->info('Installing CMS-Core...');
 		$this->newLine();
 
+		// Check if .env file exists
+		if (!file_exists(base_path('.env')))
+		{
+			$this->error('.env file not found!');
+			$this->newLine();
+
+			if (file_exists(base_path('.env.example')))
+			{
+				if ($this->confirm('Would you like to copy .env.example to .env?', true))
+				{
+					copy(base_path('.env.example'), base_path('.env'));
+					$this->info('✓ .env file created from .env.example');
+					$this->newLine();
+					$this->warn('Please configure your .env file (database, etc.) and run this command again.');
+					return self::FAILURE;
+				}
+			}
+			else
+			{
+				$this->warn('Please create a .env file first:');
+				$this->line('  cp .env.example .env');
+				$this->line('  php artisan key:generate');
+			}
+
+			return self::FAILURE;
+		}
+
 		// Install Jetstream if not skipped
 		if (!$this->option('skip-jetstream'))
 		{
@@ -502,51 +529,12 @@ class InstallCommand extends Command
 
 		$content = file_get_contents($routesPath);
 
-		// Check if Jetstream routes are already registered
-		if (!str_contains($content, 'Jetstream::routes()'))
-		{
-			// Add Jetstream routes after the opening PHP tag
-			if (preg_match('/<\?php\s*\n/', $content))
-			{
-				$content = preg_replace(
-					'/<\?php\s*\n/',
-					"<?php\n\nuse Laravel\\Jetstream\\Jetstream;\n",
-					$content,
-					1
-				);
-			}
-
-			// Add Jetstream::routes() before the root route
-			if (!str_contains($content, 'Jetstream::routes()'))
-			{
-				$jetstreamRoutes = "\n// Jetstream routes (profile, teams, etc.)\nJetstream::routes();\n\n";
-
-				// Find the position to insert (before Route::get('/'))
-				if (preg_match("/Route::get\(['\"]\/['\"]/", $content, $matches, PREG_OFFSET_CAPTURE))
-				{
-					$position = $matches[0][1];
-					$content = substr_replace($content, $jetstreamRoutes, $position, 0);
-				}
-				else
-				{
-					// If no root route found, append at the end
-					$content .= "\n" . $jetstreamRoutes;
-				}
-			}
-
-			file_put_contents($routesPath, $content);
-			$this->info('✓ Jetstream routes registered');
-		}
-
 		// Check if already redirects to admin
 		if (str_contains($content, "redirect('/admin')"))
 		{
 			$this->info('✓ Root route already redirects to /admin');
 			return;
 		}
-
-		// Reload content after potential Jetstream routes addition
-		$content = file_get_contents($routesPath);
 
 		// Replace default route
 		$content = preg_replace(
@@ -557,6 +545,7 @@ class InstallCommand extends Command
 
 		file_put_contents($routesPath, $content);
 		$this->info('✓ Root route redirects to /admin');
+		$this->info('  (Jetstream routes are registered automatically in Laravel 11+)');
 	}
 
 	protected function registerApiRoutes(): void
