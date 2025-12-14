@@ -2,7 +2,7 @@
 
 All notable changes to `cms-core` will be documented in this file.
 
-## v1.3.11 - 2024-12-14
+## v1.3.12 - 2024-12-14
 
 ### Changed
 - **Removed teams migrations from CMS-Core package** - Teams tables (`teams`, `team_user`, `team_invitations`) are now managed exclusively by Jetstream
