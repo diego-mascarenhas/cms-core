@@ -1,7 +1,7 @@
 # CMS-Core Project Rules
 
 ## Stack
-- Laravel 12, Filament 4, Jetstream Teams, Livewire 3, Spatie Permission, Tailwind
+- Laravel 12, Filament 5, Jetstream Teams, Livewire 4, Spatie Permission, Tailwind CSS 4
 
 ## Code Style
 - Language: English for code/comments
@@ -41,5 +41,22 @@
 ## Logout
 - Always via POST method
 - URL: `Filament::getLogoutUrl()`
+
+## Filament 5 Conventions
+- **Namespace Changes**: Filament 5 maintains v4 namespaces (no breaking changes from v4)
+- **Livewire 4 Integration**: Uses Livewire 4 as the underlying framework
+- **Icons**: Use `Heroicon` enum instead of strings where applicable
+- **SPA Mode**: Available with `->spa()` in panel configuration
+
+## Livewire 4 Conventions
+- **wire:model**: Use `wire:model` for live binding (default behavior in v4)
+  - Old `wire:model.live` → now just `wire:model`
+  - For lazy binding use `wire:model.blur` or `wire:model.lazy`
+- **Computed Properties**: Use `#[Computed]` attribute instead of `getXProperty()` methods
+  - Import: `use Livewire\Attributes\Computed;`
+  - Syntax: `#[Computed] public function propertyName() { return $value; }`
+  - Access in template: `$this->propertyName`
+- **Component Tags**: Both `@livewire('component')` and `<livewire:component />` are supported
+- **New Features**: Islands, wire:sort, wire:transition, optimistic UI directives
 
 

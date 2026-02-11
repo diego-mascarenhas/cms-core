@@ -171,7 +171,7 @@
     @endif
 
     <!-- Role Management Modal -->
-    <x-dialog-modal wire:model.live="currentlyManagingRole">
+    <x-dialog-modal wire:model="currentlyManagingRole">
         <x-slot name="title">
             {{ __('Manage Role') }}
         </x-slot>
@@ -217,7 +217,7 @@
     </x-dialog-modal>
 
     <!-- Leave Team Confirmation Modal -->
-    <x-confirmation-modal wire:model.live="confirmingLeavingTeam">
+    <x-confirmation-modal wire:model="confirmingLeavingTeam">
         <x-slot name="title">
             {{ __('Leave Team') }}
         </x-slot>
@@ -238,7 +238,7 @@
     </x-confirmation-modal>
 
     <!-- Remove Team Member Confirmation Modal -->
-    <x-confirmation-modal wire:model.live="confirmingTeamMemberRemoval">
+    <x-confirmation-modal wire:model="confirmingTeamMemberRemoval">
         <x-slot name="title">
             {{ __('Remove Team Member') }}
         </x-slot>

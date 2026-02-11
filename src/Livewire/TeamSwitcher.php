@@ -3,6 +3,7 @@
 namespace Idoneo\CmsCore\Livewire;
 
 use Illuminate\Support\Collection;
+use Livewire\Attributes\Computed;
 use Livewire\Component;
 
 class TeamSwitcher extends Component
@@ -25,7 +26,8 @@ class TeamSwitcher extends Component
 	/**
 	 * Get all teams sorted alphabetically.
 	 */
-	public function getTeamsProperty(): Collection
+	#[Computed]
+	public function teams(): Collection
 	{
 		return auth()->user()->allTeams()->sortBy('name');
 	}
@@ -33,7 +35,8 @@ class TeamSwitcher extends Component
 	/**
 	 * Get current team ID.
 	 */
-	public function getCurrentTeamIdProperty(): ?int
+	#[Computed]
+	public function currentTeamId(): ?int
 	{
 		return auth()->user()->currentTeam?->id;
 	}

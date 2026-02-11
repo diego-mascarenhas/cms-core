@@ -2,6 +2,65 @@
 
 All notable changes to `cms-core` will be documented in this file.
 
+## v2.0.0 - 2026-02-11
+
+### Breaking Changes
+- **Upgraded to Filament 5.2.1** (from 4.3.0)
+- **Upgraded to Livewire 4.1.4** (from 3.7.1)
+- **Upgraded to Tailwind CSS 4.0.0** (from 3.4.0)
+
+### Changed - Livewire 4 Migration
+- **Computed Properties**: Migrated from `getXProperty()` methods to `#[Computed]` attributes
+  - `TeamSwitcher` component updated with new computed property syntax
+  - Added `use Livewire\Attributes\Computed;` import
+- **wire:model Directives**: Updated all `wire:model.live` to `wire:model`
+  - Livewire 4 makes "live" behavior default
+  - Updated 11 Blade templates with wire:model changes
+  - Files: team-member-manager, delete-team-form, profile forms, api-token-manager, confirms-password
+
+### Changed - Tailwind CSS 4 Migration
+- **CSS Import Syntax**: Changed from `@tailwind` directives to `@import "tailwindcss"`
+- **Vite Configuration**: Added `@tailwindcss/vite` plugin
+- **PostCSS**: Removed `postcss.config.js` (no longer needed with Tailwind CSS 4)
+- **Build System**: Updated Vite to use Tailwind CSS 4 native plugin
+
+### Changed - Filament 5
+- **Core Framework**: Updated all Filament packages to v5.2.1
+  - filament/filament, filament/actions, filament/forms
+  - filament/infolists, filament/notifications, filament/schemas
+  - filament/support, filament/tables, filament/widgets
+- **Plugins**: Updated Spatie plugins to v5.2.1
+  - filament/spatie-laravel-media-library-plugin
+  - filament/spatie-laravel-tags-plugin
+- **Note**: Filament 5 maintains v4 API compatibility, main change is Livewire 4 integration
+
+### Changed - Project Rules
+- Updated `.cursorrules` with Filament 5 and Livewire 4 conventions
+- Added guidelines for `#[Computed]` attributes
+- Added wire:model behavior documentation
+- Updated stack versions in documentation
+
+### Updated Dependencies
+- `laravel/framework`: 12.42.0 → 12.51.0
+- `blade-ui-kit/blade-icons`: 1.8.0 → 1.8.1
+- `spatie/laravel-medialibrary`: 11.17.6 → 11.18.2
+- 50+ additional package updates
+
+### Security
+- Fixed 1 high severity NPM vulnerability via `npm audit fix`
+- Noted 2 dev-only Composer vulnerabilities (PHPUnit, PsySH) - do not affect production
+
+### Documentation
+- Added comprehensive `UPGRADE_SUMMARY.md` with complete migration details
+- Updated all code examples in documentation
+- Added references to Filament 5 and Livewire 4 upgrade guides
+
+### Technical Notes
+- Filament 5 has no new features vs v4, only Livewire 4 integration
+- Livewire 4 introduces: Islands, wire:sort, wire:transition, optimistic UI
+- Tailwind CSS 4 uses new plugin architecture with @tailwindcss/vite
+- All changes backward compatible within major version bump
+
 ## v1.3.1 - 2024-12-13
 
 ### Fixed
